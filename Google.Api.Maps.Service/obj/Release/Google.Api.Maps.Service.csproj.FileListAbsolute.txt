@@ -1,0 +1,5 @@
+C:\projects\software_GIT\ServiceSoftware\GraphLog\Google.Api.Maps.Service\bin\Release\Google.Api.Maps.Service.dll
+C:\projects\software_GIT\ServiceSoftware\GraphLog\Google.Api.Maps.Service\bin\Release\Google.Api.Maps.Service.pdb
+C:\projects\software_GIT\ServiceSoftware\GraphLog\Google.Api.Maps.Service\obj\Release\Google.Api.Maps.Service.csprojResolveAssemblyReference.cache
+C:\projects\software_GIT\ServiceSoftware\GraphLog\Google.Api.Maps.Service\obj\Release\Google.Api.Maps.Service.dll
+C:\projects\software_GIT\ServiceSoftware\GraphLog\Google.Api.Maps.Service\obj\Release\Google.Api.Maps.Service.pdb

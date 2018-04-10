@@ -1,0 +1,14 @@
+C:\Temp\gmaps-api-net-0.9.2a\src\Google.Api.Maps.Service\bin\Debug\Google.Api.Maps.Service.dll
+C:\Temp\gmaps-api-net-0.9.2a\src\Google.Api.Maps.Service\bin\Debug\Google.Api.Maps.Service.pdb
+C:\Temp\gmaps-api-net-0.9.2a\src\Google.Api.Maps.Service\bin\Debug\Newtonsoft.Json.dll
+C:\Temp\gmaps-api-net-0.9.2a\src\Google.Api.Maps.Service\obj\Debug\Google.Api.Maps.Service.dll
+C:\Temp\gmaps-api-net-0.9.2a\src\Google.Api.Maps.Service\obj\Debug\Google.Api.Maps.Service.pdb
+C:\projects\software_GIT\ServiceSoftware\GraphLog\Google.Api.Maps.Service\bin\Debug\Google.Api.Maps.Service.dll
+C:\projects\software_GIT\ServiceSoftware\GraphLog\Google.Api.Maps.Service\bin\Debug\Google.Api.Maps.Service.pdb
+C:\projects\software_GIT\ServiceSoftware\GraphLog\Google.Api.Maps.Service\obj\Debug\Google.Api.Maps.Service.dll
+C:\projects\software_GIT\ServiceSoftware\GraphLog\Google.Api.Maps.Service\obj\Debug\Google.Api.Maps.Service.pdb
+C:\projects\software_GIT\ServiceSoftware\GraphLog - Copy\Google.Api.Maps.Service\bin\Debug\Google.Api.Maps.Service.dll
+C:\projects\software_GIT\ServiceSoftware\GraphLog - Copy\Google.Api.Maps.Service\bin\Debug\Google.Api.Maps.Service.pdb
+C:\projects\software_GIT\ServiceSoftware\GraphLog - Copy\Google.Api.Maps.Service\obj\Debug\Google.Api.Maps.Service.dll
+C:\projects\software_GIT\ServiceSoftware\GraphLog - Copy\Google.Api.Maps.Service\obj\Debug\Google.Api.Maps.Service.pdb
+C:\projects\software_GIT\ServiceSoftware\GraphLog - Copy\Google.Api.Maps.Service\obj\Debug\Google.Api.Maps.Service.csprojResolveAssemblyReference.cache
