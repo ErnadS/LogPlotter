@@ -127,10 +127,10 @@ namespace GraphLog.DL2_analyse
 
                 for (int i = 20; i < fPhase.Length; i++)
                 {
-                    float fPhaseDeriv = calculatePhaseDirection(i);
-                    // AddPhaseDirect(fTime[0] + i, fPhaseDirection);
-                    fPhaseDerivAvg[i] = phaseDevAvg.calculateAvg(fPhaseDeriv);
-                    AddPhaseDirect(fTime[0] + i, calculatePhaseAcceler(i));//);
+                    float fPhaseDeriv = calculatePhaseFirstDerivation(i);
+                    // AddPhaseDirect(fTime[0] + i, fPhaseDeriv);
+                     fPhaseDerivAvg[i] = phaseDevAvg.calculateAvg(fPhaseDeriv);
+                     AddPhaseDirect(fTime[0] + i, calculatePhaseSecondDerivation(i));//);
                 }
             }
 
@@ -145,45 +145,48 @@ namespace GraphLog.DL2_analyse
             }
         }
 
-        const int DIR_COUNT =  10;
+        const int DEV_1_IGNORE_COUNT = 30;
+        const int DEV_1_COUNT =  30;
 
-        private float calculatePhaseDirection(int sampleNo)
+        private float calculatePhaseFirstDerivation(int sampleNo)
         {
-            if (sampleNo < DIR_COUNT*2)
-                return float.NaN;
+            if (sampleNo < DEV_1_COUNT * 2 + DEV_1_IGNORE_COUNT)
+                return 0;
 
             float firstPart = 0;
             float secondPart = 0;
 
             // pogledaj DIR_COUNT prethodnih mjerenja (podjeli ih u 2 grupe i nadji sumu)
-            for (int i = 0; i < DIR_COUNT; i++)
+            for (int i = 0; i < DEV_1_COUNT; i++)
             {
-                firstPart += fPhaseAvg[sampleNo - DIR_COUNT - i];  // prvih 10
+                firstPart += fPhaseAvg[sampleNo - DEV_1_IGNORE_COUNT - i - DEV_1_COUNT];  // prvih 10
                 secondPart += fPhaseAvg[sampleNo      - i];         // drugih 10
             }
 
-            float fAngle = (secondPart - firstPart) * 1000000000;  // ne bi trebalo mnoziti sa 10000 nego dijeliti sa dX ali je ovdje to malo pogresno. X-osa mora biti u skladu sa Y da bi bilo realno govoriti o uglu
+            float fAngle = (secondPart - firstPart) * 1000000000 / 3;  // ne bi trebalo mnoziti sa 10000 nego dijeliti sa dX ali je ovdje to malo pogresno. X-osa mora biti u skladu sa Y da bi bilo realno govoriti o uglu
             // Za sada je najbinije da imamo polaritet ugla (opada/raste) a sta nam znaci kada je ugao 45 stepeni, to mozemo riktati sa ovih mnozenjem 
             return fAngle;
         }
+        
+        const int ACCELER_IGNORE_COUNT = 50;
+        const int ACCELER__COUNT = 10;
 
-        const int ACCELER_COUNT = 200;
-        private float calculatePhaseAcceler(int sampleNo)
+        private float calculatePhaseSecondDerivation(int sampleNo)
         {
-            if (sampleNo < ACCELER_COUNT * 3)
+            if (sampleNo < ACCELER_IGNORE_COUNT + 2 * ACCELER__COUNT)
                 return fPhaseDerivAvg[sampleNo];
 
             float firstPart = 0;
             float secondPart = 0;
 
             // pogledaj DIR_COUNT prethodnih mjerenja (podjeli ih u 2 grupe i nadji sumu)
-            for (int i = 0; i < ACCELER_COUNT; i++)
+            for (int i = 0; i < ACCELER__COUNT; i++)
             {
-                firstPart += fPhaseDerivAvg[sampleNo - 2*ACCELER_COUNT - i];  // prvih 10
+                firstPart += fPhaseDerivAvg[sampleNo - ACCELER_IGNORE_COUNT - i - ACCELER__COUNT];  // prvih 10
                 secondPart += fPhaseDerivAvg[sampleNo - i];         // drugih 10
             }
 
-            float fAngle = (secondPart - firstPart) / ACCELER_COUNT ;  // ne bi trebalo mnoziti sa 10000 nego dijeliti sa dX ali je ovdje to malo pogresno. X-osa mora biti u skladu sa Y da bi bilo realno govoriti o uglu
+            float fAngle = (secondPart - firstPart) / (ACCELER__COUNT * 3);  // ne bi trebalo mnoziti sa 10000 nego dijeliti sa dX ali je ovdje to malo pogresno. X-osa mora biti u skladu sa Y da bi bilo realno govoriti o uglu
             // Za sada je najbinije da imamo polaritet ugla (opada/raste) a sta nam znaci kada je ugao 45 stepeni, to mozemo riktati sa ovih mnozenjem 
             return fAngle;
         }
