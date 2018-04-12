@@ -84,11 +84,11 @@ namespace GraphLog.DL2_analyse
             }
 
 
-            graphPainter.autozoom(0);
+          /*  graphPainter.autozoom(0);
             graphPainter.autozoom(3);
             graphPainter.autozoom(4);
             graphPainter.autozoom(5);
-
+            */
             Console.WriteLine("finished reading");
         }
 
