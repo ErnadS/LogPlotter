@@ -93,8 +93,8 @@ namespace GraphLog.DL2_analyse
         }
 
 
-        const int DEV_1_IGNORE_COUNT = 30;
-        const int DEV_1_COUNT =  30;
+        const int DEV_1_IGNORE_COUNT = 5;
+        const int DEV_1_COUNT =  20;
 
         private float calculatePhaseFirstDerivation(int sampleNo)
         {
@@ -111,13 +111,13 @@ namespace GraphLog.DL2_analyse
                 secondPart += fPhaseAvg[sampleNo      - i];         // drugih 10
             }
 
-            float fAngle = (secondPart - firstPart) * 1000000000 / 3;  // ne bi trebalo mnoziti sa 10000 nego dijeliti sa dX ali je ovdje to malo pogresno. X-osa mora biti u skladu sa Y da bi bilo realno govoriti o uglu
+            float fAngle = (secondPart - firstPart) * 1000000000 / 8;  // ne bi trebalo mnoziti sa 10000 nego dijeliti sa dX ali je ovdje to malo pogresno. X-osa mora biti u skladu sa Y da bi bilo realno govoriti o uglu
             // Za sada je najbinije da imamo polaritet ugla (opada/raste) a sta nam znaci kada je ugao 45 stepeni, to mozemo riktati sa ovih mnozenjem 
             return fAngle;
         }
         
-        const int ACCELER_IGNORE_COUNT = 50;
-        const int ACCELER__COUNT = 10;
+        const int ACCELER_IGNORE_COUNT = 2;
+        const int ACCELER__COUNT = 5;
 
         private float calculatePhaseSecondDerivation(int sampleNo)
         {
@@ -134,7 +134,7 @@ namespace GraphLog.DL2_analyse
                 secondPart += fPhaseDerivAvg[sampleNo - i];         // drugih 10
             }
 
-            float fAngle = (secondPart - firstPart) / (ACCELER__COUNT * 3);  // ne bi trebalo mnoziti sa 10000 nego dijeliti sa dX ali je ovdje to malo pogresno. X-osa mora biti u skladu sa Y da bi bilo realno govoriti o uglu
+            float fAngle = (secondPart - firstPart) / (ACCELER__COUNT/ 2);  // ne bi trebalo mnoziti sa 10000 nego dijeliti sa dX ali je ovdje to malo pogresno. X-osa mora biti u skladu sa Y da bi bilo realno govoriti o uglu
             // Za sada je najbinije da imamo polaritet ugla (opada/raste) a sta nam znaci kada je ugao 45 stepeni, to mozemo riktati sa ovih mnozenjem 
             return fAngle;
         }
