@@ -55,13 +55,16 @@
   <ItemGroup>
     <Compile Include="CheckSum.cs" />
     <Compile Include="DL2_analyse\Average.cs" />
-    <Compile Include="DL2_analyse\DL2_LogParser.cs" />
+    <Compile Include="DL2_analyse\DacMeasurement.cs" />
+    <Compile Include="DL2_analyse\PhaseHandler.cs" />
+    <Compile Include="DL2_analyse\FileParser.cs" />
     <Compile Include="DL2_analyse\FormDL2.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="DL2_analyse\FormDL2.Designer.cs">
       <DependentUpon>FormDL2.cs</DependentUpon>
     </Compile>
+    <Compile Include="DL2_analyse\TemperMeasurment.cs" />
     <Compile Include="FileLinesReader.cs" />
     <Compile Include="FileLoger.cs">
       <SubType>Code</SubType>

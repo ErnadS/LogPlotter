@@ -55,7 +55,7 @@ namespace GraphLog.DL2_analyse
             positionSliderButton.BackColor = Color.Transparent;
         }
 
-        DL2_LogParser logParser;
+        PhaseHandler phaseHandler;
         
         private void buttonOpenFile_Click(object sender, EventArgs e)
         {
@@ -74,7 +74,7 @@ namespace GraphLog.DL2_analyse
 
                
 
-                logParser = new DL2_LogParser(this, graphPainter);
+                phaseHandler = new PhaseHandler(graphPainter);
               
      
                 graphPainter.init_X_Limit();
@@ -86,7 +86,7 @@ namespace GraphLog.DL2_analyse
                 Phase_avg_graph.SetY_Limit(-200, 200);
                 Phase_dir_graph.SetY_Limit(-200, 200);
 
-                logParser.readFile(filePath);
+                phaseHandler.parseFiles(filePath);
                 //graphPainter.SetRangeX(Projection.X_limit_Min, Projection.X_limit_Max);
                 RefreshGraph();
             }
@@ -401,13 +401,11 @@ namespace GraphLog.DL2_analyse
            
         }   
       
-       
-
 
         private void buttonRepaintGraph_Click(object sender, EventArgs e)
         {
             this.graphPainter.Clear();
-            logParser = new DL2_LogParser(this, graphPainter);
+            phaseHandler = new PhaseHandler(graphPainter);
     
             graphPainter.init_X_Limit();
          //   graphPainter.SetRangeX(Projection.X_limit_Min, Projection.X_limit_Max);

@@ -228,7 +228,7 @@ namespace GraphLog.graph
                     {
                         Point p = projection.ConvertToScreenPoint(sample);
 
-                        if (!float.IsNaN(sample.Y)/* && sample.Y != fPrevY*/ && p.Y > -10000000 && p.Y < 10000000)  // ovo sa " p.Y < 10000000" je dodano da ne pada program. TODO: pogledaj zasto ima takve vrijednosti
+                        if (!float.IsNaN(sample.Y) && sample.Y != fPrevY && p.Y > -10000000 && p.Y < 10000000)  // ovo sa " p.Y < 10000000" je dodano da ne pada program. TODO: pogledaj zasto ima takve vrijednosti
                         {
                             graphics.FillEllipse(new SolidBrush(_graphPen.Color), p.X - 2, p.Y - 2, 4, 4);
                         }
