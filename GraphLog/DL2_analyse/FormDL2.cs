@@ -36,7 +36,8 @@ namespace GraphLog.DL2_analyse
         Graph Temper_graph;
 
         Graph Phase_avg_graph;
-        Graph Phase_dir_graph;
+        Graph Phase_firstDeriv_graph;
+        Graph Phase_secDeriv_graph;
 
         public FormDL2()
         {
@@ -84,7 +85,8 @@ namespace GraphLog.DL2_analyse
                 DAC_graph.SetY_Limit(100000, 150000);
                 Temper_graph.SetY_Limit(0, 40);
                 Phase_avg_graph.SetY_Limit(-200, 200);
-                Phase_dir_graph.SetY_Limit(-200, 200);
+                Phase_firstDeriv_graph.SetY_Limit(-200, 200);
+                Phase_secDeriv_graph.SetY_Limit(-200, 200);
 
                 phaseHandler.parseFiles(filePath);
                 //graphPainter.SetRangeX(Projection.X_limit_Min, Projection.X_limit_Max);
@@ -126,16 +128,21 @@ namespace GraphLog.DL2_analyse
             Phase_avg_graph.SetPalette(Color.Green, Color.Gray, Color.Gray, 2, false);
             graphPainter.AddGraph(Phase_avg_graph);
 
-            Phase_dir_graph = new Graph("DIR", MAX_GRAPH_COUNT, 20);
-            Phase_dir_graph.SetPalette(Color.Brown, Color.Gray, Color.Gray, 1, true);
-            graphPainter.AddGraph(Phase_dir_graph);
+            Phase_firstDeriv_graph = new Graph("First_dev", MAX_GRAPH_COUNT, 20);
+            Phase_firstDeriv_graph.SetPalette(Color.Brown, Color.Gray, Color.Gray, 1, true);
+            graphPainter.AddGraph(Phase_firstDeriv_graph);
+
+            Phase_secDeriv_graph = new Graph("Sec_dev", MAX_GRAPH_COUNT, 20);
+            Phase_secDeriv_graph.SetPalette(Color.FromArgb(192, 192, 0), Color.Gray, Color.Gray, 1, true);
+            graphPainter.AddGraph(Phase_secDeriv_graph);
+
 
             Phase_graph.SetVisible(STW_R_L.Checked);
             DAC_graph.SetVisible(STW_R_T.Checked);
             Temper_graph.SetVisible(checkBox3.Checked);
             Phase_avg_graph.SetVisible(checkBox1.Checked);
-            Phase_dir_graph.SetVisible(checkBox2.Checked);
-
+            Phase_firstDeriv_graph.SetVisible(checkBox2.Checked);
+            Phase_secDeriv_graph.SetVisible(checkBox4.Checked);
             //Phase_graph.SetY_Limit(-200, 200);
             //DAC_graph.SetY_Limit((int)numericUpDown2.Value, (int)numericUpDown1.Value);
                 
@@ -400,7 +407,6 @@ namespace GraphLog.DL2_analyse
         {
            
         }   
-      
 
         private void buttonRepaintGraph_Click(object sender, EventArgs e)
         {
@@ -408,7 +414,7 @@ namespace GraphLog.DL2_analyse
             phaseHandler = new PhaseHandler(graphPainter);
     
             graphPainter.init_X_Limit();
-         //   graphPainter.SetRangeX(Projection.X_limit_Min, Projection.X_limit_Max);
+            // graphPainter.SetRangeX(Projection.X_limit_Min, Projection.X_limit_Max);
             RefreshGraph();
         }
 
@@ -430,13 +436,19 @@ namespace GraphLog.DL2_analyse
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
-            Phase_dir_graph.SetVisible(checkBox2.Checked);
+            Phase_firstDeriv_graph.SetVisible(checkBox2.Checked);
             graphPainter.Refresh();
         }
 
         private void checkBox3_CheckedChanged(object sender, EventArgs e)
         {
             Temper_graph.SetVisible(checkBox3.Checked);
+            graphPainter.Refresh();
+        }
+
+        private void checkBox4_CheckedChanged(object sender, EventArgs e)
+        {
+            Phase_secDeriv_graph.SetVisible(checkBox4.Checked);
             graphPainter.Refresh();
         }
     }

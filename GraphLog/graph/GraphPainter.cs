@@ -267,6 +267,11 @@ namespace GraphLog.graph
             _graphList[nGraphIndex].setShown_Y(fNewY_start, fNewY_end);
         }
 
+        public void autozoom(int nGraphIndex)
+        {
+            _graphList[nGraphIndex].autozoom();
+        }
+
         public void Zoom_X(bool bIn, int graphWidth)
         {
             // int graphWidth = ((PictureBox)sender).Width;
@@ -420,16 +425,7 @@ namespace GraphLog.graph
         {
             return Projection.GetMinRangeX();
         }
-        // TODO: remove this? use setY_range()?
-        public void SetRangeY(float yMin, float yMax)
-        {
-            foreach (Graph source in _graphList)
-            {
-                source.setShown_Y(yMin, yMax);
-            }
-            
-            paintAll(_graphicsPictureBox);
-        }
+
 
         public void paintAll(Graphics graphics)
         {
@@ -446,6 +442,7 @@ namespace GraphLog.graph
                    _graphList[2].PaintLines(graphics);
                    _graphList[3].PaintLines(graphics);
                    _graphList[4].PaintPoints(graphics);
+                   _graphList[5].PaintPoints(graphics);
                    /*
                    foreach (Graph graph in _graphList)
                    {

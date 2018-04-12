@@ -137,9 +137,9 @@ namespace GraphLog.graph
             projection.SetY_Limit(fMin, fMax);
         }
 
-        public void SetRangeAuto()
+        public void autozoom()
         {
-            projection.setRangeY(0 /*_yMin*/, _yMax * 1.05f);  // add 5 %
+            projection.setRangeY(_yMin, _yMax * 1.05f);  // add 5 %
         }
         
         public void SetVisible(bool visible)

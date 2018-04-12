@@ -62,15 +62,14 @@ namespace GraphLog.DL2_analyse
                         fPhaseAvg[i] = fPhaseAvg[i];
 
                     AddPhaseAvgToGraph(dacMeasur.fTime[0] + i, fPhaseAvg[i] * 1000000000);//* 1000000000);
-                }
-
-
+                }    
+               
                 for (int i = 20; i < fPhase.Length; i++)
                 {
                     float fPhaseDeriv = calculatePhaseFirstDerivation(i);
                     AddPhaseFirstDeviationToGraph(dacMeasur.fTime[0] + i, fPhaseDeriv);
-                    // fPhaseDerivAvg[i] = phaseDevAvg.calculateAvg(fPhaseDeriv);
-                    // AddPhaseFirstDeviationToGraph(dacMeasur.fTime[0] + i, calculatePhaseSecondDerivation(i));//);
+                    fPhaseDerivAvg[i] = phaseDevAvg.calculateAvg(fPhaseDeriv);
+                    AddPhaseSecondDeviationToGraph(dacMeasur.fTime[0] + i, calculatePhaseSecondDerivation(i));
                 }
             }
 
@@ -83,6 +82,12 @@ namespace GraphLog.DL2_analyse
                     AddTemperatureToGraph(temper.fTimeTemper[i], temper.fTemper[i]);
                 }
             }
+
+
+            graphPainter.autozoom(0);
+            graphPainter.autozoom(3);
+            graphPainter.autozoom(4);
+            graphPainter.autozoom(5);
 
             Console.WriteLine("finished reading");
         }
@@ -137,27 +142,32 @@ namespace GraphLog.DL2_analyse
 
         public void AddPhaseToGraph(float fX, float fPhase)
         {
-            graphPainter.AddPoint(new GraphPoint(fX, fPhase), 0, false);   // "0" je za graf br. 0 (dodaj tacuku u graf br. 0)
+            graphPainter.AddPoint(new GraphPoint(fX, fPhase), 0, true);   // true da update autoscroll na fazi
         }
 
         public void AddDacToGraph(float fX, float fDAC)
         {
-            graphPainter.AddPoint(new GraphPoint(fX, fDAC), 1, false);   // "1" je za graf br. 1 (dodaj tacuku u graf br. 1)
+            graphPainter.AddPoint(new GraphPoint(fX, fDAC), 1, true);   // "1" je za graf br. 1 (dodaj tacuku u graf br. 1)
         }
 
         public void AddTemperatureToGraph(float fX, float fTemper)
         {
-            graphPainter.AddPoint(new GraphPoint(fX, fTemper), 2, false);   // "1" je za graf br. 1 (dodaj tacuku u graf br. 1)
+            graphPainter.AddPoint(new GraphPoint(fX, fTemper), 2, true);   // "1" je za graf br. 1 (dodaj tacuku u graf br. 1)
         }
 
         public void AddPhaseAvgToGraph(float fX, float fDACavg)
         {
-            graphPainter.AddPoint(new GraphPoint(fX, fDACavg), 3, false);   //
+            graphPainter.AddPoint(new GraphPoint(fX, fDACavg), 3, true);   //
         }
 
         public void AddPhaseFirstDeviationToGraph(float fX, float fDACdir)
         {
-            graphPainter.AddPoint(new GraphPoint(fX, fDACdir), 4, false);   //
+            graphPainter.AddPoint(new GraphPoint(fX, fDACdir), 4, true);   //
+        }
+
+        public void AddPhaseSecondDeviationToGraph(float fX, float fDACdir)
+        {
+            graphPainter.AddPoint(new GraphPoint(fX, fDACdir), 5, true);   //
         }
     }
 }

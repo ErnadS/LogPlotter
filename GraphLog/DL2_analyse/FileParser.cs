@@ -121,7 +121,7 @@ namespace GraphLog.DL2_analyse
 
             String[] lines = File.ReadAllLines(strTemperFilePath);
 
-            if (lines.Length == null)
+            if (lines.Length == 0)
                 return null;
 
             TemperMeasurment temperatur = new TemperMeasurment(lines.Length);

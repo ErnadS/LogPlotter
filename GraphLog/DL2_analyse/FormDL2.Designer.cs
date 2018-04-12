@@ -36,12 +36,13 @@
             this.STW_R_L = new System.Windows.Forms.CheckBox();
             this.STW_R_T = new System.Windows.Forms.CheckBox();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.checkBox4 = new System.Windows.Forms.CheckBox();
+            this.checkBox3 = new System.Windows.Forms.CheckBox();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.label5 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
-            this.checkBox3 = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -55,10 +56,10 @@
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox.Location = new System.Drawing.Point(-49, 92);
+            this.pictureBox.Location = new System.Drawing.Point(-49, 104);
             this.pictureBox.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBox.Name = "pictureBox";
-            this.pictureBox.Size = new System.Drawing.Size(1312, 485);
+            this.pictureBox.Size = new System.Drawing.Size(1312, 473);
             this.pictureBox.TabIndex = 35;
             this.pictureBox.TabStop = false;
             this.pictureBox.LoadCompleted += new System.ComponentModel.AsyncCompletedEventHandler(this.pictureBox_LoadCompleted);
@@ -69,7 +70,7 @@
             // 
             this.button2.BackgroundImage = global::GraphLog.Properties.Resources.folder_icon1;
             this.button2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.button2.Location = new System.Drawing.Point(561, 6);
+            this.button2.Location = new System.Drawing.Point(643, 6);
             this.button2.Margin = new System.Windows.Forms.Padding(4);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(70, 51);
@@ -125,6 +126,7 @@
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.White;
+            this.panel2.Controls.Add(this.checkBox4);
             this.panel2.Controls.Add(this.checkBox3);
             this.panel2.Controls.Add(this.checkBox2);
             this.panel2.Controls.Add(this.checkBox1);
@@ -134,8 +136,34 @@
             this.panel2.ForeColor = System.Drawing.SystemColors.ControlText;
             this.panel2.Location = new System.Drawing.Point(7, 5);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(470, 80);
+            this.panel2.Size = new System.Drawing.Size(552, 92);
             this.panel2.TabIndex = 56;
+            // 
+            // checkBox4
+            // 
+            this.checkBox4.AutoSize = true;
+            this.checkBox4.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.checkBox4.Location = new System.Drawing.Point(328, 60);
+            this.checkBox4.Name = "checkBox4";
+            this.checkBox4.Size = new System.Drawing.Size(190, 21);
+            this.checkBox4.TabIndex = 151;
+            this.checkBox4.Text = "Phase Second Derivation";
+            this.checkBox4.UseVisualStyleBackColor = true;
+            this.checkBox4.CheckedChanged += new System.EventHandler(this.checkBox4_CheckedChanged);
+            // 
+            // checkBox3
+            // 
+            this.checkBox3.AutoSize = true;
+            this.checkBox3.Checked = true;
+            this.checkBox3.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox3.ForeColor = System.Drawing.Color.Red;
+            this.checkBox3.Location = new System.Drawing.Point(197, 46);
+            this.checkBox3.Name = "checkBox3";
+            this.checkBox3.Size = new System.Drawing.Size(112, 21);
+            this.checkBox3.TabIndex = 150;
+            this.checkBox3.Text = "Temperature";
+            this.checkBox3.UseVisualStyleBackColor = true;
+            this.checkBox3.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
             // 
             // checkBox2
             // 
@@ -143,9 +171,9 @@
             this.checkBox2.ForeColor = System.Drawing.Color.SaddleBrown;
             this.checkBox2.Location = new System.Drawing.Point(328, 34);
             this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(130, 21);
+            this.checkBox2.Size = new System.Drawing.Size(169, 21);
             this.checkBox2.TabIndex = 149;
-            this.checkBox2.Text = "Phase Direction";
+            this.checkBox2.Text = "Phase First Derivation";
             this.checkBox2.UseVisualStyleBackColor = true;
             this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
             // 
@@ -173,7 +201,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(483, 6);
+            this.button1.Location = new System.Drawing.Point(565, 6);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(71, 49);
             this.button1.TabIndex = 63;
@@ -191,20 +219,6 @@
             this.button3.Text = "Repaint";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.buttonRepaintGraph_Click);
-            // 
-            // checkBox3
-            // 
-            this.checkBox3.AutoSize = true;
-            this.checkBox3.Checked = true;
-            this.checkBox3.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox3.ForeColor = System.Drawing.Color.Red;
-            this.checkBox3.Location = new System.Drawing.Point(197, 46);
-            this.checkBox3.Name = "checkBox3";
-            this.checkBox3.Size = new System.Drawing.Size(112, 21);
-            this.checkBox3.TabIndex = 150;
-            this.checkBox3.Text = "Temperature";
-            this.checkBox3.UseVisualStyleBackColor = true;
-            this.checkBox3.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
             // 
             // label1
             // 
@@ -284,5 +298,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
+        public System.Windows.Forms.CheckBox checkBox4;
     }
 }
