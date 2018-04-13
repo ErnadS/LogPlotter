@@ -56,6 +56,12 @@ namespace GraphLog.graph
         {
             X_limit_Min = fMin;
             X_limit_Max = fMax;
+
+            if (XMin < X_limit_Min)
+                XMin = X_limit_Min;
+
+            if (fMax > X_limit_Max)
+                fMax = X_limit_Max;
         }
 
         

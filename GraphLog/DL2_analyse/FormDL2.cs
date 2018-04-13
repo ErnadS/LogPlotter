@@ -78,7 +78,7 @@ namespace GraphLog.DL2_analyse
                 phaseHandler = new PhaseHandler(graphPainter);
               
      
-                graphPainter.init_X_Limit();
+                // graphPainter.init_X_Limit();
                 // graphPainter.SetRangeY(-5, 20);
 
                 Phase_graph.SetY_Limit(-200, 200);
@@ -89,6 +89,8 @@ namespace GraphLog.DL2_analyse
                 Phase_secDeriv_graph.SetY_Limit(-200, 200);
 
                 phaseHandler.parseFiles(filePath);
+
+                graphPainter.init_X_Limit();
                 //graphPainter.SetRangeX(Projection.X_limit_Min, Projection.X_limit_Max);
                 RefreshGraph();
             }
