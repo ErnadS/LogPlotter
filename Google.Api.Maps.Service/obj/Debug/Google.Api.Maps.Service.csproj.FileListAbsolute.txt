@@ -16,9 +16,13 @@ C:\Ernad\Elreg\projekti\InApril_Clock\LogPlotter\Google.Api.Maps.Service\bin\Deb
 C:\Ernad\Elreg\projekti\InApril_Clock\LogPlotter\Google.Api.Maps.Service\bin\Debug\Google.Api.Maps.Service.pdb
 C:\Ernad\Elreg\projekti\InApril_Clock\LogPlotter\Google.Api.Maps.Service\obj\Debug\Google.Api.Maps.Service.dll
 C:\Ernad\Elreg\projekti\InApril_Clock\LogPlotter\Google.Api.Maps.Service\obj\Debug\Google.Api.Maps.Service.pdb
+<<<<<<< HEAD
 C:\projects\InApril\Clock\LogPlotter\Google.Api.Maps.Service\bin\Debug\Google.Api.Maps.Service.xml
 C:\projects\InApril\Clock\LogPlotter\Google.Api.Maps.Service\bin\Debug\Google.Api.Maps.Service.dll
 C:\projects\InApril\Clock\LogPlotter\Google.Api.Maps.Service\bin\Debug\Google.Api.Maps.Service.pdb
 C:\projects\InApril\Clock\LogPlotter\Google.Api.Maps.Service\obj\Debug\Google.Api.Maps.Service.csprojResolveAssemblyReference.cache
 C:\projects\InApril\Clock\LogPlotter\Google.Api.Maps.Service\obj\Debug\Google.Api.Maps.Service.dll
 C:\projects\InApril\Clock\LogPlotter\Google.Api.Maps.Service\obj\Debug\Google.Api.Maps.Service.pdb
+=======
+C:\Ernad\Elreg\projekti\InApril_Clock\LogPlotter\Google.Api.Maps.Service\bin\Debug\Google.Api.Maps.Service.xml
+>>>>>>> d57fc0e018c8ffc7abb40231baecb62758f82b97
