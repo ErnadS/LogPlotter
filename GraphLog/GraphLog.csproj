@@ -166,12 +166,6 @@
   <ItemGroup>
     <None Include="images\folder-icon.png" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Google.Api.Maps.Service\Google.Api.Maps.Service.csproj">
-      <Project>{44C0377C-9B5C-4B25-9735-FECF5D165C1D}</Project>
-      <Name>Google.Api.Maps.Service</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

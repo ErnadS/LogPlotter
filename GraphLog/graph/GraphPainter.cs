@@ -138,6 +138,7 @@ namespace GraphLog.graph
                 if (_graphList[i].IsVisible())
                 {
                     fReal = _graphList[i].projection.ConvertScreenXToRealValue(nXscreen);
+                    strX = "" + (int)fReal;
                     GraphPoint closest = _graphList[i].GetClosestPointTo_X(fReal);
                     if (closest != null && !float.IsNaN(closest.Y))
                     {
@@ -145,7 +146,7 @@ namespace GraphLog.graph
                         if (screenPoint.X > 0 && screenPoint.Y > 0)
                         {
                             x = screenPoint.X;
-                            strX = "" + closest.X;
+                           // strX = "" + closest.X;
                             _graphicsPictureBox.FillRectangle(new SolidBrush(Color.Yellow), screenPoint.X, screenPoint.Y, 25, 25);
                             _graphicsPictureBox.FillRectangle(new SolidBrush(Color.FromArgb(0xff, 0x00, 0x00)), screenPoint.X - 2, screenPoint.Y - 2, 4, 4);
 
