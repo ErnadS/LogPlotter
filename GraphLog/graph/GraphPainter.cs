@@ -442,8 +442,8 @@ namespace GraphLog.graph
                    _graphList[1].PaintPoints(graphics);
                    _graphList[2].PaintLines(graphics);
                    _graphList[3].PaintLines(graphics);
-                   _graphList[4].PaintPoints(graphics);
-                   _graphList[5].PaintPoints(graphics);
+                   _graphList[4].PaintLines(graphics);
+                   _graphList[5].PaintLines(graphics);
                    /*
                    foreach (Graph graph in _graphList)
                    {

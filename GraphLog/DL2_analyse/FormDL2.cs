@@ -46,7 +46,7 @@ namespace GraphLog.DL2_analyse
 
             BitmapImage bitmapImage = new BitmapImage();
             positionSliderButton = new PositionSliderButton();
-            this.positionPanel.Controls.Add(this.positionSliderButton);
+            // this.positionPanel.Controls.Add(this.positionSliderButton);
 
             positionSliderButton.BackgroundImage = global::GraphLog.Properties.Resources.BlueRectanglePosition;
             positionSliderButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
@@ -100,10 +100,10 @@ namespace GraphLog.DL2_analyse
         {
             this.Invoke((MethodInvoker)delegate
             {
-                if (bShow)
+             /*   if (bShow)
                     positionPanel.Show();
                 else
-                    positionPanel.Hide();
+                    positionPanel.Hide();*/
             });
         }
         
@@ -221,7 +221,7 @@ namespace GraphLog.DL2_analyse
         // can be one panel for postion slider? If "null", it is not used
         public void positionPanel_Refresh()
         {
-            positionPanel.Refresh();
+            //positionPanel.Refresh();
         }
 
         private void positionPanel_Paint(object sender, PaintEventArgs e)
@@ -297,7 +297,7 @@ namespace GraphLog.DL2_analyse
                 _isClicked = false;
                 _startPoint = stopPoint;
 
-                positionPanel.Refresh();
+                // positionPanel.Refresh();
                 return;
             }
 
