@@ -11,8 +11,8 @@ namespace GraphLog.DL2_analyse
         float previousOutputValue = 0;
         float outputValue;
 
-        int AVG_SIZE          = 10;
-        float ALPHA_NORMAL    = 0.2f;
+        int AVG_SIZE          = 20;
+        float ALPHA_NORMAL    = 0.05f;
 
 
         public float calculateAvg(float fNextInput)
