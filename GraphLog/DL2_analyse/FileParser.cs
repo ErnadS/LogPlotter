@@ -161,6 +161,8 @@ namespace GraphLog.DL2_analyse
             {
                 // fPhase[i] = (float)(50 * Math.Sin(i * Math.PI / 180 / 20)); //
                 fPhase[i] = float.Parse(lines[i], System.Globalization.CultureInfo.InvariantCulture);
+                if (fPhase[i] > 0.01f || fPhase[i] < -0.01f)
+                    fPhase[i] = float.NaN;
             }
 
             Console.WriteLine("Found: " + fPhase.Length + " phase measurements");
