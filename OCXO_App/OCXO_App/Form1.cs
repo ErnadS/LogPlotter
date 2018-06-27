@@ -24,19 +24,38 @@ namespace OCXO_App
         Thread t;
         Stopwatch stopwatch = new Stopwatch();
         bool closedLoopFlag = false;
-        double dac_value = 131072;
-        double oldValue = 131072;
-        List<double> oldValues = new List<double>(131072);
+        const double DEFAULT_DAC_VALUE = 0;
+        double dac_value = DEFAULT_DAC_VALUE;
+        double oldValue = DEFAULT_DAC_VALUE;
+        List<double> oldValues = new List<double>(0);
         List<Int32> phaseArr = new List<Int32>();
-        double movingAverage = 0;
+        double DAC_movingAverage = DEFAULT_DAC_VALUE; // NEW!!! Startamo sa 131072
         Int32 counter = 0;
-        Int32 cnt = 0;
-        bool fastFlag = true;
-        bool mediumFlag = false;
+
         string inputData;
+
+        AverageExp phaseExpAvg = new AverageExp();
+
+        enum TuningState
+        {
+            CROASE,  // ne znam je li ovo pogresna rijec za "grubo"
+            MEDIUM,
+            FINE
+        }
+
+        // Nemoj imati vise varijabli za jedno stanje (povecava sansu da imas gresku). Bolje je jedna varijabla sa vise stanja.
+        TuningState tuningState = TuningState.CROASE;
+
+        MediumTuning mediumTuning = new MediumTuning();
+
         public Form1()
         {
             InitializeComponent();
+            initializeGraph();
+        }
+
+        private void initializeGraph()
+        {
             cartesianChart1.Series = new SeriesCollection
             {
                 new LineSeries
@@ -88,188 +107,186 @@ namespace OCXO_App
                 serialOCXOPort = new SerialPort(dacComPort.Text, 57600);
                 serialPhasePort.Open();
                 serialOCXOPort.Open();
-                t = new Thread(updatePhaseValue);
+                t = new Thread(handleInputFromFPGA);
                 t.Start();
                 stopwatch.Start();
             }
             catch(Exception) { }
         }
 
-        private void updatePhaseValue()
+        private void addPhaseToGraph(double phase)
+        {
+            this.Invoke((MethodInvoker)delegate()
+            {
+                // Add to phase graph
+                currentPhaseValue.Text = phase.ToString();
+                cartesianChart1.Series[0].Values.Add(new ObservablePoint
+                {
+                    X = stopwatch.Elapsed.TotalSeconds,
+                    Y = phase
+                });
+                if (cartesianChart1.Series[0].Values.Count >= 500)
+                {
+                    cartesianChart1.Series[0].Values.RemoveAt(0);
+                }
+            });
+        }
+
+        private void writePhaseToFile(double phase)
+        {
+            using (StreamWriter ph = new StreamWriter("phase2.txt", true))
+            {
+                ph.WriteLine(phase.ToString());
+                ph.Close();
+            }
+        }
+
+        private void addDacToGraph(double newDacValue)
+        {
+            this.Invoke((MethodInvoker)delegate()
+            {
+                currentDacValue.Text = newDacValue.ToString();
+
+                cartesianChart2.Series[0].Values.Add(new ObservablePoint
+                {
+                    X = stopwatch.Elapsed.TotalSeconds,
+                    Y = Int32.Parse(newDacValue.ToString())
+                });
+                if (cartesianChart2.Series[0].Values.Count >= 500)
+                {
+                    cartesianChart2.Series[0].Values.RemoveAt(0);
+                }
+            });
+        }
+
+        private void writeDacToFile(double newDacValue)
+        {
+            // write DAC to file
+            writeDACToFile(newDacValue.ToString(), stopwatch.Elapsed.TotalSeconds);
+            oldValue = newDacValue;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Sljedece 3 funkcije bi trebalo prebaciti u neki "DacHandler.cs" ali to cemo drugi put. On bi primio kao argument objekt ove forme
+        // i onda bi mogao osvjeziti graf kada obradi poruke
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        private void handleInputFromFPGA()  // promjenio sam ime "updatePhaseValue" jer mi zvuci kao da ova funkcija samo osvjezava vrjednost faze (a ovo je glavna funkcija). Ti ces sigurno naci bolje ime ("mainHandler"???)
         {
             while (serialPhasePort.IsOpen)
             {
                 try
                 {
                     inputData = serialPhasePort.ReadLine();
-                    double phase = calculatePhase(inputData);
-                    this.Invoke((MethodInvoker)delegate ()
+                    // TODO: !!! ovdje bi trebalo provjeriti da li je primljena linja ispravne duzine i ispisati gresku ako nastane
+                    double lastPhase = Phase.calculatePhaseFromInputString(inputData);
+
+                    addPhaseToGraph(lastPhase);
+                    writePhaseToFile(lastPhase);
+
+                    if (closedLoopFlag) //closed loop operation
                     {
-                        currentPhaseValue.Text = phase.ToString();
-                        cartesianChart1.Series[0].Values.Add(new ObservablePoint {
-                            X = stopwatch.Elapsed.TotalSeconds,
-                            Y = phase
-                        });
-                        if(cartesianChart1.Series[0].Values.Count >= 500)
-                        {
-                            cartesianChart1.Series[0].Values.RemoveAt(0);
-                        }
-                        using (StreamWriter ph = new StreamWriter("phase.txt", true))
-                        {
-                            ph.WriteLine(phase.ToString());
-                            ph.Close();
-                        }
-                        cnt++;
-                        if (cnt == 60)
-                        {
-                            cnt = 0;
-                            serialOCXOPort.Write("!T\r\n");
-                            string s = serialOCXOPort.ReadLine();
-                            s.Replace("\r", "");
-                            label10.Text = s;
+                        dac_value = calculateNewDACValue(inputData, lastPhase);
 
-                            serialOCXOPort.DiscardInBuffer();
-                            serialOCXOPort.DiscardOutBuffer();
-                            using (StreamWriter temp = new StreamWriter("temperature.txt", true))
-                            {
-                                temp.WriteLine(stopwatch.Elapsed.TotalSeconds.ToString() + " " + s);
-                                temp.Close();
-                            }
+                        // Send DAC (if changed) to FPGA
+                        if (dac_value != oldValue)
+                        {
+                            serialOCXOPort.Write("!D" + dac_value.ToString() + "\r\n");
                         }
-                        if (closedLoopFlag) //closed loop operation
-                        {/*
-                            cnt++;
-                            if (cnt == 60)
-                            {
-                                cnt = 0;
-                                serialOCXOPort.Write("!T\r\n");
-                                string s = serialOCXOPort.ReadLine();
-                                s.Replace("\r", "");
-                                label10.Text = s;
 
-                                serialOCXOPort.DiscardInBuffer();
-                                serialOCXOPort.DiscardOutBuffer();
-                                using (StreamWriter temp = new StreamWriter("temperature.txt", true))
-                                {
-                                    temp.WriteLine(stopwatch.Elapsed.TotalSeconds.ToString() + " " + s);
-                                    temp.Close();
-                                }
-                            }
-                            else
-                            {*/
-                                dac_value = calculateDACValue(inputData);
-                                if (dac_value != oldValue)
-                                {
-                                    serialOCXOPort.Write("!D" + dac_value.ToString() + "\r\n");
-                                }
-                            //}
-                            this.Invoke((MethodInvoker)delegate ()
-                            {
-                                currentDacValue.Text = dac_value.ToString();
-                            });
-                            cartesianChart2.Series[0].Values.Add(new ObservablePoint
-                            {
-                                X = stopwatch.Elapsed.TotalSeconds,
-                                Y = Int32.Parse(dac_value.ToString())
-                            });
-                            if (cartesianChart2.Series[0].Values.Count >= 500)
-                            {
-                                cartesianChart2.Series[0].Values.RemoveAt(0);
-                            }
-                            writeDACToFile(dac_value.ToString(), stopwatch.Elapsed.TotalSeconds);
-                            oldValue = dac_value;
-                        }
-                    });
+                        addDacToGraph(dac_value);
+                        writeDacToFile(dac_value);
+                    }
                 }
-                catch(Exception) { }
+                catch(Exception e) 
+                {
+                    Console.WriteLine("Exception 88: " + e.ToString()); // !!! Uvjek ispisuj Exceptions jer ti mogu prikazati neku gresku koja ce ti otkriti gdje imas problem
+                }
             }
         }
 
-        private Int32 calculateDACValue(string input)
+        private Int32 calculateNewDACValue(string input, double lastPhase)
         {
-            string[] subInputs = input.Split(',');
-            List<Int32> inputValues = new List<Int32>();
-            double phase = 0;
-            /****************************************
-             * Racunanje faze iz primljene poruke
-             ****************************************/
-            foreach (string s in subInputs)
-            {
-                inputValues.Add(Int32.Parse(s));
-            }
-            phase = inputValues[2];
-            if (inputValues[0] == 0)
-            {
-                phase = (phase + inputValues[3]/4 - inputValues[4]/4) * (-1);
-            }
-            else
-            {
-                phase = (phase + inputValues[4] / 4 - inputValues[3] / 4);
-            }
-            /****************************************
-             * Racunanje faze iz primljene poruke
-             ****************************************/
+            // ovo nije ista faza kao sto je racuna prva funkcija. Treba jos sigurno promjeniti ime ali ne razumijem sta radi
+            double phase = Phase.calculatePhaseFromInputString_B(input);
 
-            /****************************************
-             * fastFlag == grubo podesavanje
-             * kada se starta prvo ide grubo podesavanje dok fazna razlika 
-             * ne bude mala a nakon toga se prelazi na fino
-             ****************************************/
-            if (Math.Abs(calculatePhase(inputData)) < 0.8)
+            if (Math.Abs(lastPhase) < 0.8) 
             {
-                if (fastFlag)
+                checkTuningState(phase);  // change state to MEDIUM if phase low in last 100 measurements
+
+                if (tuningState == TuningState.CROASE) // Grubo podesavanje
                 {
-                    if (oldValues.Count == 499)
-                    {
-                        movingAverage -= oldValues[0];
-                        oldValues.RemoveAt(0);
-                    }
-                    double tmp = movingAverage + phase * 20;
-                    if (tmp > 261144)
-                    {
-                        tmp = 262143;
-                    }
-                    else if (tmp < 0)
-                    {
-                        tmp = 0;
-                    }
-                    movingAverage += tmp / 500;
-                    oldValues.Add(tmp / 500);
+                    double tmp = coarseTuneDAC(phase); 
 
-                    //Uslov za fino podesenje da je faza 100 sekundi manja od 5*7.3ns
-                    if (phase < 5)
-                    {
-                        counter++;
-                        if (counter == 100)
-                        {
-                            fastFlag = false;
-                            mediumFlag = true;
-                            label9.Text = "Medium Tuning ON";
-                        }
-                    }
                     return Convert.ToInt32(tmp);
                 }
-                /****************************************
-                 * Kraj grubog podesenja
-                 ****************************************/
-
-                /****************************************
-                 * Fino podesenje
-                 ****************************************/
-                else if (mediumFlag)
+                else if (tuningState == TuningState.MEDIUM) // Srednje podesavanje
                 {
-                    phaseArr.Add(Convert.ToInt32(calculateAvg(phase)));
+                    return Convert.ToInt32(mediumTuning.calculateMediumTuning(dac_value, lastPhase));
+                    // OVO VRATI AKO HOCES DA PROBAS STARU FUNKCIJU
+                    // Faza se dodaje u listu i svako deset sekundo se poziva funkcija calculateMediumtuning
+                    /*phaseArr.Add(Convert.ToInt32(phaseExpAvg.calculateExpAvg(phase))); //calculateAvg(phase)));
                     if (phaseArr.Count == 10)
-                    {
-                        // Faza se dodaje u listu i svako deset sekundo se poziva funkcija calculateMediumtuning
+                    {                   
                         Int32 retval = Convert.ToInt32(calculateMediumTuning());
                         phaseArr.Clear();
                         return retval;
-                    }
+                    }*/
                 }
             }
-            return Convert.ToInt32(dac_value);
+
+            return Convert.ToInt32(dac_value); // return previous value if lastPhase > 0.8
         }
+
+        private void checkTuningState(double phase)
+        {
+            if (phase < 5) //Uslov za fino podesenje da je faza 100 sekundi manja od 5*7.3ns
+            {
+                counter++;
+                if (counter == 100)
+                {
+                    tuningState = TuningState.MEDIUM;
+
+                    label9.Text = "Medium Tuning ON";
+                }
+            }
+        }
+
+        // kako se kaze "grubo"? Je li "coarse" ispravno?
+        private double coarseTuneDAC(double phase)
+        {
+            // remove first value from average before adding the new (if array is full)
+            if (oldValues.Count == 499) //  == 499   Tek ako imamo 500, onda moramo jedan izbaciti
+            {
+                DAC_movingAverage -= oldValues[0];
+                oldValues.RemoveAt(0);
+            }
+
+            double tmp = (DAC_movingAverage + phase * 20);
+
+            if (tmp > 261144)  // Limit max. DAC
+            {
+                Console.WriteLine("!!! To big DAC: " + tmp);  // vazno je ispisivati ako ti npr. moze pokazati da zbog neke greske precesto dolazi ovdje 
+                tmp = 262143;
+            }
+            else if (tmp < 0) // Limit min. DAC
+            {
+                Console.WriteLine("!!! Negative DAC: " + tmp);  // ako je normalno da ovdje dolazi puno puta, izbaci ove WriteLine jer onda usporavaju program
+                tmp = 0;
+            }
+
+            oldValues.Add(tmp / 500); // 500); // jos uvjek nismo dodali zadnji element pa imamo "+1" zbog njega
+            DAC_movingAverage += tmp / 500; // 500;  // sada smo dodali taj element pa ne trebao "+1" (imamo 500 ako je napunjena)
+
+
+            return Convert.ToInt32(tmp);  // !!!HELP: Mozda mi ovo bude jasno kada objasnis kako racunas "phase" (u funkciji calculatePhaseFromInputString_B()/Phase.cs)
+            // Ja bi ocekivao da ova funkcija prvi put vrati 131072 i da onda na tu vrjednost dodaje/oduzima "phase*20" ili tako nesto ali ne mislim da to radi. 
+            // Prva vrijednost u dac_value.txt je obicno nula pa onda npr. 13380, 26347 ...
+            // Ovdje mi je najcudnije da se ne returnira "tmp/500". Mozemo ovo na voice
+        }
+
+
+        
+        
 
         /*****************************************
         * Funkcija za racunanje finog podesenja
@@ -284,11 +301,10 @@ namespace OCXO_App
             double sumX2 = 0;
             for(int i = 0; i < 5; i++) //racuna se zbig prvih pet i zadnjih pet elemenata
             {
-                sumFirst5 += phaseArr[i];
-                sumSecond5 += phaseArr[i + 5];
+                sumFirst5 += Math.Abs(phaseArr[i]);
+                sumSecond5 += Math.Abs(phaseArr[i + 5]);
             }
-            double derv = (sumSecond5 - sumFirst5) * 1000;
-            if ((derv > 0 && sumFirst5 > 0 && sumSecond5 > 0) || (derv < 0 && sumFirst5 < 0 && sumSecond5 < 0)) // ako je zadnjih pet vece od prvih pet znaci pocelo je da luta
+            if (sumFirst5 < sumSecond5) // ako je zadnjih pet vece od prvih pet znaci pocelo je da luta
             {
                 for (int i = 0; i < phaseArr.Count; i++) //Racunanje koeficijenata za linearnu regresiju (Terjeove formule)
                 {
@@ -303,7 +319,7 @@ namespace OCXO_App
                 double phaseError = sumY / phaseArr.Count + (slope * phaseArr.Count) / 2;
                 double CVOffset = slope / 0.0002516;
                 double CVPhaseError = phaseError / 0.0002516 * phaseArr.Count;
-                double CVTotal = CVOffset / 500 + CVPhaseError / 5000; //1000 i 10000
+                double CVTotal = CVOffset / 1000 + CVPhaseError / 10000;
 
                 if (CVTotal > 1000)//Cisto da ogranicimo ako se nesto "ludo" desi da se moze vratiti
                 {
@@ -331,66 +347,6 @@ namespace OCXO_App
             }
         }
 
-        int m_sampleCount = 0;
-        double previousOutputValue = 0;
-        double outputValue;
-
-        const int AVG_SIZE = 10;
-        const double ALPHA_NORMAL = 0.1;
-
-
-        private double calculateAvg(double fNextInput)
-        {
-            m_sampleCount++;
-
-            if (m_sampleCount < AVG_SIZE)
-            {
-                previousOutputValue = fNextInput;
-                return fNextInput;
-            }
-
-            outputValue = ALPHA_NORMAL * fNextInput + (1.0f - ALPHA_NORMAL) * previousOutputValue;
-            previousOutputValue = outputValue;
-            return outputValue;
-        }
-
-        private double calculatePhase(string input)
-        {
-            string[] subInputs = input.Split(',');
-            List<Int32> inputValues = new List<Int32>();
-            double phase = 0;
-            foreach (string s in subInputs)
-            {
-                inputValues.Add(Int32.Parse(s));
-            }
-            if (inputValues.Count == 5)
-            {
-                if (inputValues[0] == 0)
-                {
-                    if (inputValues[1] == 0)
-                    {
-                        phase = ((Convert.ToDouble(inputValues[2]) / 400000000) + inputValues[3] * (20 * Math.Pow(10, (-11))) + 2.5 * Math.Pow(10, -9) - inputValues[4] * (20 * Math.Pow(10, -11))) * (-1);
-                    }
-                    else
-                    {
-                        phase = (Convert.ToDouble(inputValues[2])) / 200000000 * (-1);
-                    }
-                }
-                else
-                {
-                    if (inputValues[1] == 0)
-                    {
-                        phase = ((Convert.ToDouble(inputValues[2]) / 400000000) + inputValues[3] * (20 * Math.Pow(10, (-11))) + 2.5 * Math.Pow(10, -9) - inputValues[4] * (20 * Math.Pow(10, -11)));
-                    }
-                    else
-                    {
-                        phase = (Convert.ToDouble(inputValues[2])) / 200000000;
-                    }
-                }
-            }
-            return phase;
-        }
-
         private void disconnect_Click(object sender, EventArgs e)
         {
             serialPhasePort.Close();
@@ -401,9 +357,6 @@ namespace OCXO_App
         private void sync_Click(object sender, EventArgs e)
         {
             serialOCXOPort.Write("!S\r\n");
-            serialOCXOPort.ReadLine();
-            serialOCXOPort.DiscardInBuffer();
-            serialOCXOPort.DiscardOutBuffer();
         }
 
         private void dac0_Click(object sender, EventArgs e)
@@ -481,7 +434,7 @@ namespace OCXO_App
 
         private void writeDACToFile(string dac_value, double seconds)
         {
-            using(StreamWriter dv = new StreamWriter("dac_value.txt", true))
+            using(StreamWriter dv = new StreamWriter("dac_value2.txt", true))
             {
                 dv.WriteLine(seconds.ToString() + " " + dac_value);
                 dv.Close();
