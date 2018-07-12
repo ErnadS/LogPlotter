@@ -93,33 +93,27 @@ namespace OCXO_App
                 nCounterPhase++;
                 phaseAvg_part_1_B = phaseExpAvg.calculateExpAvg(lastPhase); // Uzmimo drugu tacku
                 writeServiceFile("Druga tacka: " + phaseAvg_part_1_B.ToString());
+
+                int nDacChangeStep = calculateDacStep(phaseAvg_part_1_B);
+
                 // Promjenimo DAC
-                /*
-                if (phaseAvg_part_1_B < 0)
+                if((phaseAvg_part_1_B - phaseAvg_part_1_A) < 0) // opada
                 {
-                    DAC_part_2 = lastDAC - 10; // zelimo da "zaokrenemo" DAC u suprotnom smijeru i da onda izmjerimo novu fazu-average   
-                }
-                else
-                {
-                    DAC_part_2 = lastDAC + 10;
-                }*/
-                if((phaseAvg_part_1_B - phaseAvg_part_1_A) < 0)
-                {
-                    if(phaseAvg_part_1_B > 0)
+                    if(phaseAvg_part_1_B > 0)   // i pozitivan (priblizava se nuli)
                     {
-                        DAC_part_2 = lastDAC + 10;
+                        DAC_part_2 = lastDAC + nDacChangeStep;
                     } else
                     {
-                        DAC_part_2 = lastDAC - 10;
+                        DAC_part_2 = lastDAC - nDacChangeStep;
                     }
                 } else
                 {
                     if(phaseAvg_part_1_B > 0)
                     {
-                        DAC_part_2 = lastDAC + 10;
+                        DAC_part_2 = lastDAC + nDacChangeStep;
                     } else
                     {
-                        DAC_part_2 = lastDAC - 10;
+                        DAC_part_2 = lastDAC - nDacChangeStep;
                     }
                 }
                 return DAC_part_2;
@@ -135,17 +129,38 @@ namespace OCXO_App
             {
                 phaseAvg_part_2_B = phaseExpAvg.calculateExpAvg(lastPhase); // Uzmimo tacku 4
                 writeServiceFile("Cetvrta tacka tacka: " + phaseAvg_part_2_B.ToString());
+                
+                double newDac = calculateDAC();
+                
                 state = MediumState.TUNING_SLEEP; // necemo mjeanjati DAC u narednih 100 sec.
-                return calculateDAC();
+                return newDac;
             }
             else
             {
                 nCounterPhase++;
-                //Console.WriteLine("!!!! NE BI SMJELO DOCI OVDJE 2222222222");
-                phaseExpAvg.calculateExpAvg(lastPhase);
+                phaseExpAvg.calculateExpAvg(lastPhase); // dodaj tacku u average
                 calculatedDAC = lastDAC;
                 return lastDAC;
             }
+        }
+
+        private int calculateDacStep(double phaseAvg_part_1_B)
+        {
+            double absPart_1_B = Math.Abs(phaseAvg_part_1_B);
+            int nDacChangeStep;
+
+            if (absPart_1_B < 10)
+                nDacChangeStep = 1;
+            else if (absPart_1_B < 30)
+                nDacChangeStep = 2;
+            else if (absPart_1_B < 60)
+                nDacChangeStep = 4;
+            else if (absPart_1_B < 100)
+                nDacChangeStep = 10;
+            else
+                nDacChangeStep = 20;
+
+            return nDacChangeStep;
         }
 
         private double calculateDAC()
