@@ -14,7 +14,7 @@ namespace OCXO_App
             nCounter ++;
             if (nCounter == 1000) {
                 nCounter = 0;
-                return new TuningResult(lastDAC + 1, TuningResult.Result.NOT_FINISHED);  // aging (+1)
+                return new TuningResult(lastDAC - 1, TuningResult.Result.NOT_FINISHED);  // aging (+1)
             }
 
             return new TuningResult(lastDAC + 1, TuningResult.Result.NOT_FINISHED);
