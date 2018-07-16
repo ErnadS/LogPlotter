@@ -47,6 +47,7 @@ namespace OCXO_App
         TuningState tuningState = TuningState.CROASE;
 
         MediumTuning mediumTuning = new MediumTuning();
+        FineTuning fineTuning = new FineTuning();
 
         public Form1()
         {
@@ -221,7 +222,12 @@ namespace OCXO_App
                 }
                 else if (tuningState == TuningState.MEDIUM) // Srednje podesavanje
                 {
-                    return Convert.ToInt32(mediumTuning.calculateMediumTuning(dac_value, lastPhase));
+                    TuningResult result =  mediumTuning.calculateMediumTuning(dac_value, lastPhase);
+                    if (result.stateResult == TuningResult.Result.FINISHED)
+                    {
+                        tuningState = TuningState.FINE;
+                    }
+                    return Convert.ToInt32(result.newDAC);
                     // OVO VRATI AKO HOCES DA PROBAS STARU FUNKCIJU
                     // Faza se dodaje u listu i svako deset sekundo se poziva funkcija calculateMediumtuning
                     /*phaseArr.Add(Convert.ToInt32(phaseExpAvg.calculateExpAvg(phase))); //calculateAvg(phase)));
@@ -231,6 +237,12 @@ namespace OCXO_App
                         phaseArr.Clear();
                         return retval;
                     }*/
+                }
+                else if (tuningState == TuningState.FINE) // fino podesavanje
+                {
+                    TuningResult result = fineTuning.tune(dac_value, lastPhase);
+                    // if (result.stateResult == TuningResult.Result.FINISHED)   // GO TO "AGING" state
+                    return Convert.ToInt32(result.newDAC);
                 }
             }
 

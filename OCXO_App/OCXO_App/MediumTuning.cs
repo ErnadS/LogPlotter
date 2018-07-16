@@ -10,28 +10,32 @@ using System.Diagnostics;
 namespace OCXO_App
 {
     public class MediumTuning
-    {
+    {/*
         double phaseAvg_part_1_A; // startna faza od prvog dijela
         double phaseAvg_part_1_B; // krajnja faza od prvog dijela
         double phaseAvg_part_2_A;
-        double phaseAvg_part_2_B;
+        double phaseAvg_part_2_B;*/
         /// <summary>
         /// //////////////////////////////////////////////////////
         /// </summary>
+        /// 
+        /*
         double DAC_part_1;
         double DAC_part_2;
-
+        */
+        MediumTuningResult block_1 = new MediumTuningResult();
+        MediumTuningResult block_2 = new MediumTuningResult();
 
         int nCounterPhase = 0;
 
         /*****************************************
         * Funkcija za racunanje finog podesenja. Return je nova vrijednost DAC-a
         ******************************************/
-        private const int VRIJEME_UMIRIVANJA = 20;//bilo 5
-        private const int VRIJEME_MJERENJA_BLOKA = 30;//bilo 10
+        public const int VRIJEME_UMIRIVANJA = 20;//bilo 5
+        public const int VRIJEME_MJERENJA_BLOKA = 30;//bilo 10
 
 
-        AverageExp phaseExpAvg;
+        // AverageExp phaseExpAvg;
 
         const int TUNNING_SLEEP_TIME = 100; // kada jednom izracunamo "optimalni" DAC, onda ce funkcija "spavati" u 100 sec. i onda opet iz pocetka.
         int tunningSleepCounter = 0;
@@ -40,16 +44,16 @@ namespace OCXO_App
 
         enum MediumState
         {
-            MEASURING_2_BLOCK,
-            GOOING_TO_ZERO_PHASE, // ovo jos nemamo. Tu bi isli kada izracunamo "pravi" DAC ali nam je faza daleko od nule. Onda bi promjenili DAC na neki drugi koji nas vodi prema nuli
-            // i onda u pravom trenutku stavili na izracunati DAC.
-            TUNING_SLEEP  // kada ne diramo DAC npr. 100 sec da vidimo kako se ponasa. Ovdje cemo kasnije mozda mjenjati DAC za starenje ili cemo ici na fino mjerenje
+            MEASURING_BLOCK_1,
+            MEASURING_BLOCK_2,
+            TUNING_SLEEP,  // kada ne diramo DAC npr. 100 sec da vidimo kako se ponasa. Ovdje cemo kasnije mozda mjenjati DAC za starenje ili cemo ici na fino mjerenje
+            FINISHED
         }
 
-        MediumState state = MediumState.MEASURING_2_BLOCK;
+        MediumState state = MediumState.MEASURING_BLOCK_1;
 
 
-        public double calculateMediumTuning(double lastDAC, double lastPhase)
+        public TuningResult calculateMediumTuning(double lastDAC, double lastPhase)
         {
             if (state == MediumState.TUNING_SLEEP)
             {
@@ -58,19 +62,66 @@ namespace OCXO_App
                 {
                     resetMediumTuning(); // idemo opet da mjerimo 2 blocka
                 }
-                return lastDAC;
+                return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED);
             }
-            else if (state == MediumState.MEASURING_2_BLOCK)
+            else if (state == MediumState.MEASURING_BLOCK_1)
             {
-                return measure_2_blocks(lastDAC, lastPhase);
+                if (measure_blocks_1(lastDAC, lastPhase))
+                    state = MediumState.MEASURING_BLOCK_2;
+
+                return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED);
+            }
+            else if (state == MediumState.MEASURING_BLOCK_2)
+            {
+                if (measure_blocks_2(lastDAC, lastPhase))
+                {
+                    calculateNewDac();
+                    if (block_2.part_angle < 5 && block_2.phaseAvg_stop < 5) // blizu nule i lagano se mijenja
+                    {
+                        state = MediumState.FINISHED;
+                        return new TuningResult(calculatedDAC, TuningResult.Result.FINISHED);
+                    }
+                }
+
+                return new TuningResult(calculatedDAC, TuningResult.Result.NOT_FINISHED);
             }
             else
             {
-                writeServiceFile("!!!! NE BI SMJELO DOCI OVDJE");
-                return lastDAC;
+                writeServiceFile("!!!! NE BI SMJELO DOCI OVDJE, State: " + state.ToString());
+                return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED);
             }
         }
 
+        private bool measure_blocks_1(double lastDAC, double lastPhase)
+        {
+            if (block_1.nCounter == 0)
+            {
+                block_1.init(lastDAC, VRIJEME_UMIRIVANJA, VRIJEME_MJERENJA_BLOKA);
+            }
+            
+            block_1.AddPoint(lastPhase);
+
+            if (block_1.finished)
+                return true;
+
+            return false;
+        }
+
+        private bool measure_blocks_2(double lastDAC, double lastPhase)
+        {
+            if (block_2.nCounter == 0)
+            {
+                block_2.init(lastDAC, VRIJEME_UMIRIVANJA, VRIJEME_MJERENJA_BLOKA);
+            }
+
+            block_2.AddPoint(lastPhase);
+
+            if (block_2.finished)
+                return true;
+
+            return false;
+        }
+        /*
         private double measure_2_blocks(double lastDAC, double lastPhase)
         {
             if (nCounterPhase == 0)  // Startamo mjerenje prvog bloka
@@ -143,7 +194,7 @@ namespace OCXO_App
                 return lastDAC;
             }
         }
-
+        */
         private int calculateDacStep(double phaseAvg_part_1_B)
         {
             double absPart_1_B = Math.Abs(phaseAvg_part_1_B);
@@ -163,6 +214,20 @@ namespace OCXO_App
             return nDacChangeStep;
         }
 
+
+        private double calculateNewDac()
+        {
+            double newDAC = block_1.part_DAC - (block_1.phaseAvg_stop - block_1.phaseAvg_start) * (block_2.part_DAC - block_1.part_DAC) /
+                ((block_2.phaseAvg_stop - block_2.phaseAvg_start) - (block_1.phaseAvg_stop - block_1.phaseAvg_start));
+            writeServiceFile("DAC_part_1 = " + block_1.part_DAC + ", DAC_part_2 = " + block_2.part_DAC);
+            writeServiceFile("Old DAC: " + calculatedDAC + ", New DAC: " + newDAC);
+            if (calculatedDAC != 0) // ako nije prvo mjerenje medium tuningcalculatedDAC-a:
+                writeServiceFile("Starenje u zadnjih 100 sec: " + (newDAC - calculatedDAC));
+
+            calculatedDAC = newDAC;
+            return calculatedDAC;
+        }
+        /*
         private double calculateDAC()
         {
             double newDAC = DAC_part_1 - (phaseAvg_part_1_B - phaseAvg_part_1_A) * (DAC_part_2 - DAC_part_1) / ((phaseAvg_part_2_B - phaseAvg_part_2_A) - (phaseAvg_part_1_B - phaseAvg_part_1_A));
@@ -173,12 +238,12 @@ namespace OCXO_App
 
             calculatedDAC = newDAC;
             return calculatedDAC;
-        }
+        }*/
 
         public void resetMediumTuning()
         {
             nCounterPhase = 0;
-            state = MediumState.MEASURING_2_BLOCK;
+            state = MediumState.MEASURING_BLOCK_1;
             tunningSleepCounter = 0;
         }
 
