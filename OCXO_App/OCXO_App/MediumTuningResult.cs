@@ -53,10 +53,11 @@ namespace OCXO_App
             {
                 phaseAvg_stop = phaseExpAvgStop.calculateExpAvg(phase);
 
-                if (nCounter == nStartEndIndex)
+                if (nCounter == nStopEndIndex)
                 {
                     CalculateAngle();
                     finished = true;
+                    nCounter = 0;
                 }
             }
         }
@@ -64,7 +65,7 @@ namespace OCXO_App
         // Exaple: ako faza se promjeni za 0.1 u toku zadnjih 30 mjerenja, ugao je 0.1 * 1000 / 30 = 3.3
         private void CalculateAngle()
         {
-            part_angle = (phaseAvg_stop - phaseAvg_start) * 1000/ nStopEndIndex;  // "1000" je cisto da broj ne bude premal
+            part_angle = (phaseAvg_stop - phaseAvg_start) * Math.Pow(10, 9);
         }
     }
 }

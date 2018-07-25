@@ -31,13 +31,13 @@ namespace OCXO_App
         /*****************************************
         * Funkcija za racunanje finog podesenja. Return je nova vrijednost DAC-a
         ******************************************/
-        public const int VRIJEME_UMIRIVANJA = 20;//bilo 5
-        public const int VRIJEME_MJERENJA_BLOKA = 30;//bilo 10
+        public const int VRIJEME_UMIRIVANJA = 20;//bilo 5 (ovdje definisati druga imena)
+        public const int VRIJEME_MJERENJA_BLOKA = 40;//bilo 10
 
 
         // AverageExp phaseExpAvg;
 
-        const int TUNNING_SLEEP_TIME = 100; // kada jednom izracunamo "optimalni" DAC, onda ce funkcija "spavati" u 100 sec. i onda opet iz pocetka.
+        const int TUNNING_SLEEP_TIME = 30; // kada jednom izracunamo "optimalni" DAC, onda ce funkcija "spavati" u 100 sec. i onda opet iz pocetka.
         int tunningSleepCounter = 0;
 
         double calculatedDAC = 0;  // ovu bi trebali resetovati kada ispadne iz medium tuninga (ili samo napraviti novi objekat ove klase?)
@@ -67,16 +67,22 @@ namespace OCXO_App
             else if (state == MediumState.MEASURING_BLOCK_1)
             {
                 if (measure_blocks_1(lastDAC, lastPhase))
+                {
                     state = MediumState.MEASURING_BLOCK_2;
-
-                return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED);
+                    calculatedDAC = lastDAC + calculateDacStep(block_1.phaseAvg_stop);
+                }
+                else
+                {
+                    calculatedDAC = lastDAC;
+                }
+                return new TuningResult(calculatedDAC, TuningResult.Result.NOT_FINISHED);
             }
             else if (state == MediumState.MEASURING_BLOCK_2)
             {
                 if (measure_blocks_2(lastDAC, lastPhase))  // zavrsio oba bloka
                 {
                     calculateNewDac();
-                    if (block_2.part_angle < 5 && block_2.phaseAvg_stop < 5) // blizu nule i lagano se mijenja
+                    if (block_2.part_angle < 5 && block_2.phaseAvg_stop < 5 * Math.Pow(10, -9)) // blizu nule i lagano se mijenja
                     {
                         state = MediumState.FINISHED;
                         return new TuningResult(calculatedDAC, TuningResult.Result.FINISHED);
@@ -201,20 +207,26 @@ namespace OCXO_App
         */
         private int calculateDacStep(double phaseAvg_part_1_B)
         {
-            double absPart_1_B = Math.Abs(phaseAvg_part_1_B);
+            double absPart_1_B_ns = Math.Abs(phaseAvg_part_1_B)*Math.Pow(10,9);
             int nDacChangeStep;
 
-            if (absPart_1_B < 10)
-                nDacChangeStep = 1;
-            else if (absPart_1_B < 30)
-                nDacChangeStep = 2;
-            else if (absPart_1_B < 60)
-                nDacChangeStep = 4;
-            else if (absPart_1_B < 100)
+            if (absPart_1_B_ns < 5)
+                nDacChangeStep = 5;
+            else if (absPart_1_B_ns < 10)
                 nDacChangeStep = 10;
-            else
+            else if (absPart_1_B_ns < 20)
+                nDacChangeStep = 15;
+            else if (absPart_1_B_ns < 30)
                 nDacChangeStep = 20;
+            else if (absPart_1_B_ns < 100)
+                nDacChangeStep = 50;
+            else
+                nDacChangeStep = 150;
 
+            if (phaseAvg_part_1_B < 0)
+            {
+                nDacChangeStep *= -1;
+            }
             return nDacChangeStep;
         }
 

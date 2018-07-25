@@ -36,15 +36,7 @@ namespace OCXO_App
                 {
                     if (inputValues[1] == 0)  // inputValues[1] == 0 znaci faza manja od 100us (ili 50?). Onda ima smisla da koristimo i fino mjerenje u racunici
                     {
-                        if (inputValues[2] == 0) // nije izmjeren ni jedan impuls => Oba PPS-a u finom mjerenju imaju vrijeme do istog 400MHz impulsa (ne trebamo u racunici period od 400MHz (2.5 * Math.Pow(10, -9))
-                        {
-                            phase = (inputValues[3] * (20 * Math.Pow(10, (-11))) - inputValues[4] * (20 * Math.Pow(10, -11))) * (-1);
-                        }
-                        else
-                        {
-                            phase = ((Convert.ToDouble(inputValues[2]) / 400000000) + inputValues[3] * (20 * Math.Pow(10, (-11))) + 2.5 * Math.Pow(10, -9)
-                                                                                - inputValues[4] * (20 * Math.Pow(10, -11))) * (-1);
-                        }                   
+                            phase = ((Convert.ToDouble(inputValues[2]) / 400000000) + inputValues[3] * (20 * Math.Pow(10, (-11))) - inputValues[4] * (20 * Math.Pow(10, -11))) * (-1);                 
                     }
                     else // faza je veca od 100us, nema potrebe koristiti fino mjerenje i koristen je clock od 200MHz
                     {
@@ -55,15 +47,7 @@ namespace OCXO_App
                 {
                     if (inputValues[1] == 0)
                     {
-                        if (inputValues[2] == 0) // nije izmjeren ni jedan impuls => Oba PPS-a u finom mjerenju imaju vrijeme do istog 400MHz impulsa (ne trebamo u racunici period od 400MHz (2.5 * Math.Pow(10, -9))
-                        {
-                            phase = (inputValues[3] * (20 * Math.Pow(10, (-11))) - inputValues[4] * (20 * Math.Pow(10, -11)));
-                        }
-                        else
-                        {
-                            phase = ((Convert.ToDouble(inputValues[2]) / 400000000) + inputValues[3] * (20 * Math.Pow(10, (-11))) + 2.5 * Math.Pow(10, -9)
-                                                                                    - inputValues[4] * (20 * Math.Pow(10, -11)));
-                        }
+                            phase = ((Convert.ToDouble(inputValues[2]) / 400000000) + inputValues[3] * (20 * Math.Pow(10, (-11))) - inputValues[4] * (20 * Math.Pow(10, -11)));
                     }
                     else
                     {
