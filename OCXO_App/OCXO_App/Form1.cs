@@ -40,7 +40,8 @@ namespace OCXO_App
         {
             CROASE,  // ne znam je li ovo pogresna rijec za "grubo"
             MEDIUM,
-            FINE
+            FINE,
+            AGEING
         }
 
         // Nemoj imati vise varijabli za jedno stanje (povecava sansu da imas gresku). Bolje je jedna varijabla sa vise stanja.
@@ -48,6 +49,7 @@ namespace OCXO_App
 
         MediumTuning mediumTuning = new MediumTuning();
         FineTuning fineTuning = new FineTuning();
+        Ageing ageing = new Ageing();
 
         public Form1()
         {
@@ -241,7 +243,15 @@ namespace OCXO_App
                 else if (tuningState == TuningState.FINE) // fino podesavanje
                 {
                     TuningResult result = fineTuning.tune(dac_value, lastPhase);
-                    // if (result.stateResult == TuningResult.Result.FINISHED)   // GO TO "AGING" state
+                    if (result.stateResult == TuningResult.Result.FINISHED)// GO TO "AGING" state
+                    {
+                        tuningState = TuningState.AGEING;
+                    }
+                    return Convert.ToInt32(result.newDAC);
+                }
+                else if (tuningState == TuningState.AGEING)
+                {
+                    TuningResult result = ageing.ageing(dac_value, lastPhase);
                     return Convert.ToInt32(result.newDAC);
                 }
             }

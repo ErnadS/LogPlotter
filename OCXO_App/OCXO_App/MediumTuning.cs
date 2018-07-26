@@ -82,7 +82,7 @@ namespace OCXO_App
                 if (measure_blocks_2(lastDAC, lastPhase))  // zavrsio oba bloka
                 {
                     calculateNewDac();
-                    if (block_2.part_angle < 5 && block_2.phaseAvg_stop < 5 * Math.Pow(10, -9)) // blizu nule i lagano se mijenja
+                    if (block_2.part_angle < 1 && block_2.phaseAvg_stop < 5 * Math.Pow(10, -9)) // blizu nule i lagano se mijenja
                     {
                         state = MediumState.FINISHED;
                         return new TuningResult(calculatedDAC, TuningResult.Result.FINISHED);
