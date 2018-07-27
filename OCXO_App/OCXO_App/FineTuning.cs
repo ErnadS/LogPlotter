@@ -10,24 +10,27 @@ namespace OCXO_App
         int nCounter = 0;
         int smallPhasecounter = 0;
         double oldPhase = 0;
+        AverageExp phaseAverageExp = new AverageExp();
+        double phaseAverage = 0;
 
         public TuningResult tune(double lastDAC, double lastPhase)
         {
+            phaseAverage = phaseAverageExp.calculateExpAvg(lastPhase);
+            if (Math.Abs(phaseAverage) < 5 * Math.Pow(10, -9))//ovaj if izbaciti izvan ovog velikof if-a i gledati average phase
+            {
+                smallPhasecounter++;
+                if (smallPhasecounter == 50)
+                {
+                    return new TuningResult(lastDAC, TuningResult.Result.FINISHED);
+                }
+            }
+            else
+            {
+                smallPhasecounter = 0;
+            }
             nCounter ++;
             if (nCounter == 100) {
                 nCounter = 0;
-                if (Math.Abs(lastPhase) < 5 * Math.Pow(10, -9))
-                {
-                    smallPhasecounter++;
-                    if(smallPhasecounter == 50)
-                    {
-                        return new TuningResult(lastDAC, TuningResult.Result.FINISHED);
-                    }
-                }
-                else
-                {
-                    smallPhasecounter = 0;
-                }
                 if (lastPhase < 0)
                 {
                     if(oldPhase < Math.Abs(lastPhase)) { lastDAC--; }
