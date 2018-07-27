@@ -78,6 +78,7 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ageing.cs" />
     <Compile Include="AverageExp.cs" />
     <Compile Include="AverageMoving.cs" />
     <Compile Include="FineTuning.cs" />
