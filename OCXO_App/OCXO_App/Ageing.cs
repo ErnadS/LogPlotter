@@ -13,7 +13,7 @@ namespace OCXO_App
         public TuningResult ageing(double lastDAC, double lastPhase)
         {
             nCounter++;
-            if(nCounter == 1000)
+            if(nCounter == 500)
             {
                 nCounter = 0;
                 if (lastPhase < 0)

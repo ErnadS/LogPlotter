@@ -19,7 +19,7 @@ namespace OCXO_App
             if (Math.Abs(phaseAverage) < 5 * Math.Pow(10, -9))//ovaj if izbaciti izvan ovog velikof if-a i gledati average phase
             {
                 smallPhasecounter++;
-                if (smallPhasecounter == 50)
+                if (smallPhasecounter == 200)
                 {
                     return new TuningResult(lastDAC, TuningResult.Result.FINISHED);
                 }
