@@ -97,6 +97,7 @@
             this.phaseComPort.Name = "phaseComPort";
             this.phaseComPort.Size = new System.Drawing.Size(100, 20);
             this.phaseComPort.TabIndex = 4;
+            this.phaseComPort.Text = "COM8";
             // 
             // dacComPort
             // 
@@ -104,6 +105,7 @@
             this.dacComPort.Name = "dacComPort";
             this.dacComPort.Size = new System.Drawing.Size(100, 20);
             this.dacComPort.TabIndex = 5;
+            this.dacComPort.Text = "COM3";
             // 
             // connect
             // 

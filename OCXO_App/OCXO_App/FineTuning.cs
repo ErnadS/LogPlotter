@@ -19,9 +19,9 @@ namespace OCXO_App
             if (Math.Abs(phaseAverage) < 5 * Math.Pow(10, -9))//ovaj if izbaciti izvan ovog velikof if-a i gledati average phase
             {
                 smallPhasecounter++;
-                if (smallPhasecounter == 200)
+                if (smallPhasecounter == 500)
                 {
-                    return new TuningResult(lastDAC, TuningResult.Result.FINISHED);
+                    //return new TuningResult(lastDAC, TuningResult.Result.FINISHED);
                 }
             }
             else
@@ -31,17 +31,17 @@ namespace OCXO_App
             nCounter ++;
             if (nCounter == 100) {
                 nCounter = 0;
-                if (lastPhase < 0)
+                if (phaseAverage < 0)
                 {
-                    if(oldPhase < Math.Abs(lastPhase)) { lastDAC--; }
+                    if(oldPhase < Math.Abs(phaseAverage)) { lastDAC--; }
                     //return new TuningResult(lastDAC - 1, TuningResult.Result.NOT_FINISHED);  // aging (+1)
                 }
                 else
                 {
-                    if (oldPhase < Math.Abs(lastPhase)) { lastDAC++; }
+                    if (oldPhase < Math.Abs(phaseAverage)) { lastDAC++; }
                     //return new TuningResult(lastDAC + 1, TuningResult.Result.NOT_FINISHED);
                 }
-                oldPhase = Math.Abs(lastPhase);
+                oldPhase = Math.Abs(phaseAverage);
             }
             return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED);
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -24,12 +25,12 @@ namespace OCXO_App
         Thread t;
         Stopwatch stopwatch = new Stopwatch();
         bool closedLoopFlag = false;
-        const double DEFAULT_DAC_VALUE = 0;
+        const double DEFAULT_DAC_VALUE = 131072;
         double dac_value = DEFAULT_DAC_VALUE;
         double oldValue = DEFAULT_DAC_VALUE;
         List<double> oldValues = new List<double>(0);
         List<Int32> phaseArr = new List<Int32>();
-        double DAC_movingAverage = DEFAULT_DAC_VALUE; // NEW!!! Startamo sa 131072
+        double DAC_movingAverageSum = 0;// DEFAULT_DAC_VALUE; // NEW!!! Startamo sa 131072
         Int32 counter = 0;
 
         string inputData;
@@ -50,11 +51,17 @@ namespace OCXO_App
         MediumTuning mediumTuning = new MediumTuning();
         FineTuning fineTuning = new FineTuning();
         Ageing ageing = new Ageing();
+        DateTime dateTime = DateTime.Now;
+        string phaseFile = "";
+        string dacFile = "";
+
 
         public Form1()
         {
             InitializeComponent();
             initializeGraph();
+            phaseFile = "phase_" + dateTime.ToString("yyyyMMdd-HHmm") + ".txt";
+            dacFile = "dac_value_" + dateTime.ToString("yyyyMMdd-HHmm") + ".txt";
         }
 
         private void initializeGraph()
@@ -137,7 +144,7 @@ namespace OCXO_App
 
         private void writePhaseToFile(double phase)
         {
-            using (StreamWriter ph = new StreamWriter("phase2.txt", true))
+            using (StreamWriter ph = new StreamWriter(phaseFile, true))
             {
                 ph.WriteLine(phase.ToString());
                 ph.Close();
@@ -209,16 +216,16 @@ namespace OCXO_App
 
         private Int32 calculateNewDACValue(string input, double lastPhase)
         {
-            // ovo nije ista faza kao sto je racuna prva funkcija. Treba jos sigurno promjeniti ime ali ne razumijem sta radi
+            // "phase" nije u ns nego broj imupulsa counter-a (2.5 ili 5ns)
             double phase = Phase.calculatePhaseFromInputString_B(input);
 
-            if (Math.Abs(lastPhase) < 0.8) 
+            if (Math.Abs(lastPhase) < 0.8)   // fail safe (ako ima suma koji ima vrlo visoku fazu)
             {
-                checkTuningState(phase);  // change state to MEDIUM if phase low in last 100 measurements
-
                 if (tuningState == TuningState.CROASE) // Grubo podesavanje
                 {
-                    double tmp = coarseTuneDAC(phase); 
+                    double tmp = coarseTuneDAC(phase);
+
+                    checkTuningState(lastPhase);  // change state to MEDIUM if phase low in last 100 measurements
 
                     return Convert.ToInt32(tmp);
                 }
@@ -261,29 +268,36 @@ namespace OCXO_App
 
         private void checkTuningState(double phase)
         {
-            if (phase < 5) //Uslov za fino podesenje da je faza 100 sekundi manja od 5*7.3ns
+            if (Math.Abs(phase) < 200  *Math.Pow(10, -9)) //Uslov za fino podesenje da je faza 100 sekundi manja od 5*2.5ns
             {
                 counter++;
-                if (counter == 100)
+                if (counter == 50)
                 {
                     tuningState = TuningState.MEDIUM;
 
                     label9.Text = "Medium Tuning ON";
                 }
             }
+            else
+            {
+                counter = 0;
+            }
         }
 
-        // kako se kaze "grubo"? Je li "coarse" ispravno?
         private double coarseTuneDAC(double phase)
         {
             // remove first value from average before adding the new (if array is full)
             if (oldValues.Count == 499) //  == 499   Tek ako imamo 500, onda moramo jedan izbaciti
             {
-                DAC_movingAverage -= oldValues[0];
+                DAC_movingAverageSum -= oldValues[0];
                 oldValues.RemoveAt(0);
             }
 
-            double tmp = (DAC_movingAverage + phase * 20);
+            double tmp;
+            if (oldValues.Count > 0)
+                tmp = (DAC_movingAverageSum / oldValues.Count + phase * 50);   // PI regulator
+            else
+                tmp = DEFAULT_DAC_VALUE;
 
             if (tmp > 261144)  // Limit max. DAC
             {
@@ -296,8 +310,8 @@ namespace OCXO_App
                 tmp = 0;
             }
 
-            oldValues.Add(tmp / 500); // 500); // jos uvjek nismo dodali zadnji element pa imamo "+1" zbog njega
-            DAC_movingAverage += tmp / 500; // 500;  // sada smo dodali taj element pa ne trebao "+1" (imamo 500 ako je napunjena)
+            oldValues.Add(tmp); // 500); // jos uvjek nismo dodali zadnji element pa imamo "+1" zbog njega
+            DAC_movingAverageSum += tmp; // 500;  // sada smo dodali taj element pa ne trebao "+1" (imamo 500 ako je napunjena)
 
 
             return Convert.ToInt32(tmp);  // !!!HELP: Mozda mi ovo bude jasno kada objasnis kako racunas "phase" (u funkciji calculatePhaseFromInputString_B()/Phase.cs)
@@ -311,8 +325,9 @@ namespace OCXO_App
         
 
         /*****************************************
-        * Funkcija za racunanje finog podesenja
+        * Funkcija za racunanje finog podesenja (Terjina funkcija)
         ******************************************/
+        /*
         private double calculateMediumTuning()
         {
             double sumFirst5 = 0;
@@ -368,7 +383,7 @@ namespace OCXO_App
                 return dac_value;
             }
         }
-
+        */
         private void disconnect_Click(object sender, EventArgs e)
         {
             serialPhasePort.Close();
@@ -456,7 +471,7 @@ namespace OCXO_App
 
         private void writeDACToFile(string dac_value, double seconds)
         {
-            using(StreamWriter dv = new StreamWriter("dac_value2.txt", true))
+            using(StreamWriter dv = new StreamWriter(dacFile, true))
             {
                 dv.WriteLine(seconds.ToString() + " " + dac_value);
                 dv.Close();
