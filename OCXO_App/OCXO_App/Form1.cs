@@ -25,7 +25,7 @@ namespace OCXO_App
         Thread t;
         Stopwatch stopwatch = new Stopwatch();
         bool closedLoopFlag = false;
-        const double DEFAULT_DAC_VALUE = 131072;
+        const double DEFAULT_DAC_VALUE = 0;//131072;
         double dac_value = DEFAULT_DAC_VALUE;
         double oldValue = DEFAULT_DAC_VALUE;
         List<double> oldValues = new List<double>(0);
