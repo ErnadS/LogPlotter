@@ -159,6 +159,8 @@ namespace GraphLog.DL2_analyse
             
             for (int i = 0; i < lines.Length; i++)
             {
+                if (i == 11693)
+                    i = i;
                 // fPhase[i] = (float)(50 * Math.Sin(i * Math.PI / 180 / 20)); //
                 fPhase[i] = float.Parse(lines[i], System.Globalization.CultureInfo.InvariantCulture);
                 if (fPhase[i] > 0.01f || fPhase[i] < -0.01f)

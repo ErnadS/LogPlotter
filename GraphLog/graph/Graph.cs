@@ -223,7 +223,10 @@ namespace GraphLog.graph
                 foreach (var sample in _samples)
                 {
                     nCount++;
-                    
+
+                    if (sample.X == 11693)
+                        sample.X = sample.X;
+
                     if (sample.X >= Projection.XMin && sample.X <= Projection.XMax)
                     {
                         Point p = projection.ConvertToScreenPoint(sample);
