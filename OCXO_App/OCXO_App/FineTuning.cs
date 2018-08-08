@@ -10,13 +10,21 @@ namespace OCXO_App
         int nCounter = 0;
         int smallPhasecounter = 0;
         double oldPhase = 0;
-        AverageExp phaseAverageExp = new AverageExp();
+        //AverageExp phaseAverageExp = new AverageExp();
+        SlidingFrame phaseAverageExp = new SlidingFrame();
+        bool firstTime = true;
         double phaseAverage = 0;
 
         public TuningResult tune(double lastDAC, double lastPhase)
         {
-            phaseAverage = phaseAverageExp.calculateExpAvg(lastPhase);
-            if (Math.Abs(phaseAverage) < 5 * Math.Pow(10, -9))//ovaj if izbaciti izvan ovog velikof if-a i gledati average phase
+            if (firstTime)
+            {
+                phaseAverageExp.init(100, 30);
+                firstTime = false;
+            }
+            //phaseAverage = phaseAverageExp.calculateExpAvg(lastPhase);
+            phaseAverageExp.AddPoint(lastPhase);
+            if (Math.Abs(lastPhase) < 5 * Math.Pow(10, -9))//ovaj if izbaciti izvan ovog velikof if-a i gledati average phase
             {
                 smallPhasecounter++;
                 if (smallPhasecounter == 500)
@@ -31,17 +39,17 @@ namespace OCXO_App
             nCounter ++;
             if (nCounter == 100) {
                 nCounter = 0;
-                if (phaseAverage < 0)
+                if (phaseAverageExp.phaseAvg_stop < 0)
                 {
-                    if(oldPhase < Math.Abs(phaseAverage)) { lastDAC--; }
+                    if(Math.Abs(phaseAverageExp.phaseAvg_start) < Math.Abs(phaseAverageExp.phaseAvg_stop)) { lastDAC--; }
                     //return new TuningResult(lastDAC - 1, TuningResult.Result.NOT_FINISHED);  // aging (+1)
                 }
                 else
                 {
-                    if (oldPhase < Math.Abs(phaseAverage)) { lastDAC++; }
+                    if (Math.Abs(phaseAverageExp.phaseAvg_start) < Math.Abs(phaseAverageExp.phaseAvg_stop)) { lastDAC++; }
                     //return new TuningResult(lastDAC + 1, TuningResult.Result.NOT_FINISHED);
                 }
-                oldPhase = Math.Abs(phaseAverage);
+                //oldPhase = Math.Abs(phaseAverage);
             }
             return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED);
         }

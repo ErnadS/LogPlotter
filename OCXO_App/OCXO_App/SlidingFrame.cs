@@ -41,17 +41,18 @@ namespace OCXO_App
         {
             if (nCounter == averageSize)
             {
-                for (int i = 0; i < averageSize-1; i++) // izbaci prvi element i prekopiraj clanove uljevo
+                for (int i = 0; i < totalFrameSize-1; i++) // izbaci prvi element i prekopiraj clanove uljevo
                 {
                     phaseArray[i] = phaseArray[i + 1];
                 }
 
-                phaseArray[averageSize - 1] = phase; // dodaj novi element
+                phaseArray[totalFrameSize - 1] = phase; // dodaj novi element
                 completed = true;
             }
             else 
             {
                 nCounter++;  // povecavamo counter samo ako nije dosao do averageSize
+                phaseArray[totalFrameSize - nCounter - 1] = phase;
                 if (nCounter == averageSize) // upravo popunili array po prvi put
                     completed = true;
             }

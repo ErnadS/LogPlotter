@@ -39,8 +39,14 @@ namespace OCXO_App
         public double calculateExpAvg(double fNextInput)
         {
             m_sampleCount++;
-
+            /*
             if (m_sampleCount < AVG_SIZE)
+            {
+                previousOutputValue = fNextInput;
+                return fNextInput;
+            }*/
+            
+            if (m_sampleCount == 1)
             {
                 previousOutputValue = fNextInput;
                 return fNextInput;
