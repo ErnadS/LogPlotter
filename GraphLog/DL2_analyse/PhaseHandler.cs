@@ -55,6 +55,8 @@ namespace GraphLog.DL2_analyse
 
                 for (int i = 0; i < fPhase.Length; i++)
                 {
+                    if (i == 11693)
+                        i = i;
                     AddPhaseToGraph(dacMeasur.fTime[0] + i, fPhase[i] * 1000000000);   //Phase is measured each second (?). Use DAC first time as start point. Phase is in [ns]
                 
                     fPhaseAvg[i] = phaseAvg.calculateAvg(fPhase[i]);
