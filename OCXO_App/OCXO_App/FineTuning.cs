@@ -24,21 +24,10 @@ namespace OCXO_App
             }
             //phaseAverage = phaseAverageExp.calculateExpAvg(lastPhase);
             phaseAverageExp.AddPoint(lastPhase);
-            if (Math.Abs(lastPhase) < 5 * Math.Pow(10, -9))//ovaj if izbaciti izvan ovog velikof if-a i gledati average phase
-            {
-                smallPhasecounter++;
-                if (smallPhasecounter == 500)
-                {
-                    //return new TuningResult(lastDAC, TuningResult.Result.FINISHED);
-                }
-            }
-            else
-            {
-                smallPhasecounter = 0;
-            }
             nCounter ++;
             if (nCounter == 100) {
                 nCounter = 0;
+                /*
                 if (phaseAverageExp.phaseAvg_stop < 0)
                 {
                     if(Math.Abs(phaseAverageExp.phaseAvg_start) < Math.Abs(phaseAverageExp.phaseAvg_stop)) { lastDAC--; }
@@ -50,6 +39,36 @@ namespace OCXO_App
                     //return new TuningResult(lastDAC + 1, TuningResult.Result.NOT_FINISHED);
                 }
                 //oldPhase = Math.Abs(phaseAverage);
+                */
+                if(Math.Abs(phaseAverageExp.phaseAvg_stop) < 8*Math.Pow(10,-9) && Math.Abs(phaseAverageExp.part_angle) < 4)
+                {
+                    //do nothing
+                }
+                else if(Math.Abs(phaseAverageExp.phaseAvg_stop) > 8 * Math.Pow(10, -9))
+                {
+                    if(phaseAverageExp.phaseAvg_stop > 8 * Math.Pow(10, -9))
+                    {
+                        if(phaseAverageExp.part_angle > 4)
+                        {
+                            lastDAC += 2;
+                        }
+                        else if(phaseAverageExp.part_angle > 0)
+                        {
+                            lastDAC += 1;
+                        }
+                    }
+                    else if(phaseAverageExp.phaseAvg_stop < -8 * Math.Pow(10, -9))
+                    {
+                        if (phaseAverageExp.part_angle < -4)
+                        {
+                            lastDAC -= 2;
+                        }
+                        else if (phaseAverageExp.part_angle < 0)
+                        {
+                            lastDAC -= 1;
+                        }
+                    }
+                }
             }
             return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED);
         }
