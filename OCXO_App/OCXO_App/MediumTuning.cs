@@ -31,13 +31,13 @@ namespace OCXO_App
         /*****************************************
         * Funkcija za racunanje finog podesenja. Return je nova vrijednost DAC-a
         ******************************************/
-        public const int VRIJEME_UMIRIVANJA = 20;//bilo 5 (ovdje definisati druga imena)
-        public const int VRIJEME_MJERENJA_BLOKA = 40;//bilo 10
+        public const int VRIJEME_UMIRIVANJA = 15;
+        public const int VRIJEME_MJERENJA_BLOKA = VRIJEME_UMIRIVANJA *2 + AverageExp.AVG_SIZE * 2;//TODO:
 
 
         // AverageExp phaseExpAvg;
 
-        const int TUNNING_SLEEP_TIME = 30; // kada jednom izracunamo "optimalni" DAC, onda ce funkcija "spavati" u 100 sec. i onda opet iz pocetka.
+        const int TUNNING_SLEEP_TIME = 30; // kada jednom izracunamo "optimalni" DAC, onda ce funkcija "spavati" u "TUNNING_SLEEP_TIME" sec. i onda opet iz pocetka.
         int tunningSleepCounter = 0;
 
         double calculatedDAC = 0;  // ovu bi trebali resetovati kada ispadne iz medium tuninga (ili samo napraviti novi objekat ove klase?)
@@ -106,7 +106,7 @@ namespace OCXO_App
         {
             if (block_1.nCounter == 0)
             {
-                block_1.init(lastDAC, VRIJEME_UMIRIVANJA, VRIJEME_MJERENJA_BLOKA);
+                block_1.init(lastDAC, VRIJEME_UMIRIVANJA + AverageExp.AVG_SIZE, VRIJEME_MJERENJA_BLOKA);
             }
             
             block_1.AddPoint(lastPhase);
@@ -121,7 +121,7 @@ namespace OCXO_App
         {
             if (block_2.nCounter == 0)
             {
-                block_2.init(lastDAC, VRIJEME_UMIRIVANJA, VRIJEME_MJERENJA_BLOKA);
+                block_2.init(lastDAC, VRIJEME_UMIRIVANJA + AverageExp.AVG_SIZE, VRIJEME_MJERENJA_BLOKA);
             }
 
             block_2.AddPoint(lastPhase);
