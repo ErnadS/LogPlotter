@@ -66,10 +66,10 @@ namespace OCXO_App
             }
         }
 
-        // Exaple: ako faza se promjeni za 0.1 u toku zadnjih 30 mjerenja, ugao je 0.1 * 1000 / 30 = 3.3
+        // Example: ako faza se promjeni za 3ns a total Frame = 100, onda je ovo 3 deg. Ako se faza promjeni za 1.5 a total frame = 50, onda je to opet = 3 deg
         private void CalculateAngle()
         {
-            part_angle = (phaseAvg_stop - phaseAvg_start) * Math.Pow(10, 9);
+            part_angle = (phaseAvg_stop - phaseAvg_start) * Math.Pow(10, 9) * 100 / totalFrameSize;
         }
     }
 }
