@@ -46,7 +46,7 @@ namespace OCXO_App
                 }
                 else if(Math.Abs(phaseAverageExp.phaseAvg_stop) > 8 * Math.Pow(10, -9))
                 {
-                    if(phaseAverageExp.phaseAvg_stop > 8 * Math.Pow(10, -9))
+                    if(phaseAverageExp.phaseAvg_stop > 7 * Math.Pow(10, -9))
                     {
                         if(phaseAverageExp.part_angle > 4)
                         {
@@ -57,7 +57,7 @@ namespace OCXO_App
                             lastDAC += 1;
                         }
                     }
-                    else if(phaseAverageExp.phaseAvg_stop < -8 * Math.Pow(10, -9))
+                    else if(phaseAverageExp.phaseAvg_stop < -7 * Math.Pow(10, -9))
                     {
                         if (phaseAverageExp.part_angle < -4)
                         {
