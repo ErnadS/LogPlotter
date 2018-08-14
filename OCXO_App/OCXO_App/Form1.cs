@@ -129,15 +129,18 @@ namespace OCXO_App
             this.Invoke((MethodInvoker)delegate()
             {
                 // Add to phase graph
-                currentPhaseValue.Text = phase.ToString();
-                cartesianChart1.Series[0].Values.Add(new ObservablePoint
+                if (Math.Abs(phase) < 0.8)
                 {
-                    X = stopwatch.Elapsed.TotalSeconds,
-                    Y = phase
-                });
-                if (cartesianChart1.Series[0].Values.Count >= 500)
-                {
-                    cartesianChart1.Series[0].Values.RemoveAt(0);
+                    currentPhaseValue.Text = phase.ToString();
+                    cartesianChart1.Series[0].Values.Add(new ObservablePoint
+                    {
+                        X = stopwatch.Elapsed.TotalSeconds,
+                        Y = phase
+                    });
+                    if (cartesianChart1.Series[0].Values.Count >= 500)
+                    {
+                        cartesianChart1.Series[0].Values.RemoveAt(0);
+                    }
                 }
             });
         }

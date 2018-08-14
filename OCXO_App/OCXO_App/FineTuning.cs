@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace OCXO_App
 {
@@ -46,12 +47,16 @@ namespace OCXO_App
                     }
 
                     if (Math.Abs(lastConstDAC[0] - lastConstDAC[1]) <= 3)
+                    {
                         optimalDac = (lastConstDAC[0] + lastConstDAC[1]) / 2; // zlatna srednia (mada ce se zaokruziti na manji broj)
+                        writeServiceFile("Izracunati optimal DAC: " + optimalDac.ToString());
+                    }
+
                 }
             }
             else
             {
-                nTimeFromPreviousConstDAC = 0;
+                nTimeFromPreviousConstDAC++;
             }
         }
 
@@ -73,7 +78,7 @@ namespace OCXO_App
 
             if (optimalDac != 0) // ako imamo izracunat optimalni
             {
-                if (Math.Abs(phaseAverageExp.phaseAvg_stop) <= GOOD_PHASE) // usli smo unutar zadovoljavajuce faze
+                if (Math.Abs(phaseAverageExp.phaseAvg_stop) <= GOOD_PHASE * Math.Pow(10,-9)) // usli smo unutar zadovoljavajuce faze
                 {
                     nCounter = 0;
                     return new TuningResult(optimalDac, TuningResult.Result.NOT_FINISHED); // ovdje je malo glupo da koristimo "NOT_FINISHED" ... Vjerovatno bi trebali samo dac je ovjde nema zavrsenog stanja?
@@ -127,6 +132,15 @@ namespace OCXO_App
                 }
             }
             return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED);
+        }
+
+        private void writeServiceFile(string str)
+        {
+            using (StreamWriter st = new StreamWriter("serviceFile.txt", true))
+            {
+                st.WriteLine(str);
+                st.Close();
+            }
         }
     }
 }

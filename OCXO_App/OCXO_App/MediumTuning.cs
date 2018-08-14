@@ -81,7 +81,7 @@ namespace OCXO_App
             {
                 if (measure_blocks_2(lastDAC, lastPhase))  // zavrsio oba bloka
                 {
-                    calculateNewDac();
+                    //calculateNewDac();
                     if (Math.Abs(block_2.part_angle) < 3 && block_2.phaseAvg_stop < 5 * Math.Pow(10, -9)) // blizu nule i lagano se mijenja
                     {
                         state = MediumState.FINISHED;
@@ -91,6 +91,7 @@ namespace OCXO_App
                     {
                         state = MediumState.TUNING_SLEEP;
                     }
+                    calculateNewDac();
                 }
 
                 return new TuningResult(calculatedDAC, TuningResult.Result.NOT_FINISHED);
@@ -265,7 +266,7 @@ namespace OCXO_App
 
         private void writeServiceFile(string str)
         {
-            using (StreamWriter st = new StreamWriter("service.txt", true))
+            using (StreamWriter st = new StreamWriter("serviceFile.txt", true))
             {
                 st.WriteLine(str);
                 st.Close();
