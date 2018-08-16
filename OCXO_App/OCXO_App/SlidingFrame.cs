@@ -26,6 +26,7 @@ namespace OCXO_App
         public SlidingFrame()
         {
             finished = false;
+            nCounter = 0;
         }
 
         public void init(int totalFrameSize, int averageSize)
@@ -34,6 +35,12 @@ namespace OCXO_App
             this.averageSize = averageSize;
             phaseArray = new double[totalFrameSize];
 
+            completed = false;
+        }
+
+        public void clear()
+        {
+            nCounter = 0;
             completed = false;
         }
 

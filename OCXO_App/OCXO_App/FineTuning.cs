@@ -31,7 +31,7 @@ namespace OCXO_App
         int nTimeFromPreviousConstDAC;
 
 
-        private void updateConstandDacArray(int lastDAC) // u ovu array ubacujemo DAC za koji imamo konstantnu fazu (bez obzira da li je trenutna faza daleko od nule).
+        private void updateConstandDacArray(int lastDAC, int nTime) // u ovu array ubacujemo DAC za koji imamo konstantnu fazu (bez obzira da li je trenutna faza daleko od nule).
         {
             if (nTimeFromPreviousConstDAC >= IGNORING_CONST_DAC_COUNT) // ako je od proslog "idealnog DAC-a" proslo dovoljno vremena (minimalno averaging time), onda cemo prihvatiti novi "idealni DAC" ako se desi
             {
@@ -40,16 +40,15 @@ namespace OCXO_App
                     nTimeFromPreviousConstDAC = 0; // prihvaticemo ovu vrijednost tako da ce morati sacekati prije novog prihvacanja
 
                     lastConstDAC[lastConstDAC_index] = lastDAC;
-                    if (lastConstDAC_index == 0) // ako punimo prvi elemenat i ako drugi jos nije postavljen, stavimo i drugi na istu vrjednost (tako da prihvatimo ovu vrijednost kao idealnu)
+                    if (lastConstDAC_index == 0 && lastConstDAC[1] == 0) // ako punimo prvi elemenat i ako drugi jos nije postavljen, stavimo i drugi na istu vrjednost (tako da prihvatimo ovu vrijednost kao idealnu)
                     {
-                        if (lastConstDAC[1] == 0)
                             lastConstDAC[1] = lastDAC;
                     }
 
                     if (Math.Abs(lastConstDAC[0] - lastConstDAC[1]) <= 3)
                     {
-                        optimalDac = (lastConstDAC[0] + lastConstDAC[1]) / 2; // zlatna srednia (mada ce se zaokruziti na manji broj)
-                        writeServiceFile("Izracunati optimal DAC: " + optimalDac.ToString());
+                        optimalDac = (lastConstDAC[0] + lastConstDAC[1]) / 2; // zlatna sredia (mada ce se zaokruziti na manji broj)
+                        writeServiceFile("Izracunati optimal DAC: " + optimalDac.ToString() + ". Time: " + nTime);
                     }
 
                 }
@@ -61,7 +60,7 @@ namespace OCXO_App
         }
 
 
-        public TuningResult tune(double lastDAC, double lastPhase)
+        public TuningResult tune(double lastDAC, double lastPhase, int nTime)
         {
             if (firstTime)
             {
@@ -74,7 +73,7 @@ namespace OCXO_App
             phaseAverageExp.AddPoint(lastPhase);
             nCounter ++;
 
-            updateConstandDacArray((int)lastDAC);
+            updateConstandDacArray((int)lastDAC, nTime);
 
             if (optimalDac != 0) // ako imamo izracunat optimalni
             {

@@ -31,45 +31,69 @@ namespace OCXO_App
         /*****************************************
         * Funkcija za racunanje finog podesenja. Return je nova vrijednost DAC-a
         ******************************************/
-        public const int VRIJEME_UMIRIVANJA = 15;
-        public const int VRIJEME_MJERENJA_BLOKA = VRIJEME_UMIRIVANJA *2 + AverageExp.AVG_SIZE * 2;//TODO:
+        // public const int VRIJEME_UMIRIVANJA = 15;
+        // public const int VRIJEME_MJERENJA_BLOKA = VRIJEME_UMIRIVANJA *2 + AverageExp.AVG_SIZE * 2;//TODO:
 
 
         // AverageExp phaseExpAvg;
 
-        const int TUNNING_SLEEP_TIME = 30; // kada jednom izracunamo "optimalni" DAC, onda ce funkcija "spavati" u "TUNNING_SLEEP_TIME" sec. i onda opet iz pocetka.
+        const int TUNNING_SLEEP_TIME = 20; // kada jednom izracunamo "optimalni" DAC, onda ce funkcija "spavati" u "TUNNING_SLEEP_TIME" sec. i onda opet iz pocetka.
+        const int FRAME_SIZE = 30;   // u jednom frame mjerimo 2 AVG_TIME. Znaci avg od prvih 10 i zadnjih 10 (sa 10 izmedju koji se ne koriste za sada)
+        const int AVG_TIME = 10;
+
         int tunningSleepCounter = 0;
 
         double calculatedDAC = 0;  // ovu bi trebali resetovati kada ispadne iz medium tuninga (ili samo napraviti novi objekat ove klase?)
 
         enum MediumState
         {
+            TUNING_SLEEP_1,  // kada ne diramo DAC npr. 100 sec da vidimo kako se ponasa. Ovdje cemo kasnije mozda mjenjati DAC za starenje ili cemo ici na fino mjerenje
             MEASURING_BLOCK_1,
-            MEASURING_BLOCK_2,
-            TUNING_SLEEP,  // kada ne diramo DAC npr. 100 sec da vidimo kako se ponasa. Ovdje cemo kasnije mozda mjenjati DAC za starenje ili cemo ici na fino mjerenje
+            TUNING_SLEEP_2,
+            MEASURING_BLOCK_2,          
             FINISHED
         }
 
-        MediumState state = MediumState.MEASURING_BLOCK_1;
+        MediumState state = MediumState.TUNING_SLEEP_1;
+
+        SlidingFrame slidingFrame_1;
+        SlidingFrame slidingFrame_2;
+
+        double DAC_frame_1;
+        double DAC_frame_2;
 
 
-        public TuningResult calculateMediumTuning(double lastDAC, double lastPhase)
+        public MediumTuning() {
+            slidingFrame_1 = new SlidingFrame();
+            slidingFrame_1.init(FRAME_SIZE, AVG_TIME);
+
+            slidingFrame_2 = new SlidingFrame();
+            slidingFrame_2.init(FRAME_SIZE, AVG_TIME);
+        }
+
+
+        public TuningResult calculateMediumTuning(double lastDAC, double lastPhase, int nTime)
         {
-            if (state == MediumState.TUNING_SLEEP)
+            if (state == MediumState.TUNING_SLEEP_1)
             {
                 tunningSleepCounter++;
                 if (tunningSleepCounter == TUNNING_SLEEP_TIME)
                 {
                     resetMediumTuning(); // idemo opet da mjerimo 2 blocka
+                    DAC_frame_1 = lastDAC;
+                    state = MediumState.MEASURING_BLOCK_1;
                 }
                 return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED);
             }
             else if (state == MediumState.MEASURING_BLOCK_1)
             {
-                if (measure_blocks_1(lastDAC, lastPhase))
+                slidingFrame_1.AddPoint(lastPhase);
+
+                if (slidingFrame_1.finished) //   measure_blocks_1(lastDAC, lastPhase))
                 {
-                    state = MediumState.MEASURING_BLOCK_2;
-                    calculatedDAC = lastDAC + calculateDacStep(block_1.phaseAvg_stop);
+                    state = MediumState.TUNING_SLEEP_2; //  MEASURING_BLOCK_2;
+                    calculatedDAC = lastDAC + calculateDacStep(slidingFrame_1.phaseAvg_stop); //   block_1.phaseAvg_stop);
+                    DAC_frame_2 = calculatedDAC;
                 }
                 else
                 {
@@ -77,21 +101,35 @@ namespace OCXO_App
                 }
                 return new TuningResult(calculatedDAC, TuningResult.Result.NOT_FINISHED);
             }
+            else if (state == MediumState.TUNING_SLEEP_2)
+            {
+                tunningSleepCounter++;
+                if (tunningSleepCounter == TUNNING_SLEEP_TIME)
+                {
+                    tunningSleepCounter = 0;
+                    state = MediumState.MEASURING_BLOCK_2;
+                }
+                return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED);
+            }
             else if (state == MediumState.MEASURING_BLOCK_2)
             {
-                if (measure_blocks_2(lastDAC, lastPhase))  // zavrsio oba bloka
+                slidingFrame_2.AddPoint(lastPhase);
+
+                if (slidingFrame_2.finished) //measure_blocks_2(lastDAC, lastPhase))  // zavrsio oba bloka
                 {
-                    //calculateNewDac();
+                    calculateNewDac(nTime);
+
+                    // TESTIRAMO MEDIUM. NECEMO ICI U FINE TUNINIG
+                    /*
                     if (Math.Abs(block_2.part_angle) < 3 && block_2.phaseAvg_stop < 5 * Math.Pow(10, -9)) // blizu nule i lagano se mijenja
                     {
                         state = MediumState.FINISHED;
                         return new TuningResult(calculatedDAC, TuningResult.Result.FINISHED);
                     }
                     else
-                    {
-                        state = MediumState.TUNING_SLEEP;
-                    }
-                    calculateNewDac();
+                    {*/
+                        state = MediumState.TUNING_SLEEP_1;
+                   // }
                 }
 
                 return new TuningResult(calculatedDAC, TuningResult.Result.NOT_FINISHED);
@@ -102,7 +140,7 @@ namespace OCXO_App
                 return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED);
             }
         }
-
+        /*
         private bool measure_blocks_1(double lastDAC, double lastPhase)
         {
             if (block_1.nCounter == 0)
@@ -131,90 +169,21 @@ namespace OCXO_App
                 return true;
 
             return false;
-        }
-        /*
-        private double measure_2_blocks(double lastDAC, double lastPhase)
-        {
-            if (nCounterPhase == 0)  // Startamo mjerenje prvog bloka
-            {
-                phaseExpAvg = new AverageExp(); // startamo average
-                nCounterPhase++;
-                phaseExpAvg.calculateExpAvg(lastPhase); // ne treba nam average vrijednost nego samo ubacujemo da on gradi novu average
-                DAC_part_1 = lastDAC;
-                return DAC_part_1;
-            }
-            else if (nCounterPhase == (VRIJEME_UMIRIVANJA))
-            {
-                nCounterPhase++;
-                phaseAvg_part_1_A = phaseExpAvg.calculateExpAvg(lastPhase);  // Uzmimo prvu tacku
-                writeServiceFile("Prva tacka: " + phaseAvg_part_1_A.ToString());
-                return DAC_part_1;
-            }
-            else if (nCounterPhase == (VRIJEME_UMIRIVANJA + VRIJEME_MJERENJA_BLOKA))
-            {
-                nCounterPhase++;
-                phaseAvg_part_1_B = phaseExpAvg.calculateExpAvg(lastPhase); // Uzmimo drugu tacku
-                writeServiceFile("Druga tacka: " + phaseAvg_part_1_B.ToString());
-
-                int nDacChangeStep = calculateDacStep(phaseAvg_part_1_B);
-
-                // Promjenimo DAC
-                if((phaseAvg_part_1_B - phaseAvg_part_1_A) < 0) // opada
-                {
-                    if(phaseAvg_part_1_B > 0)   // i pozitivan (priblizava se nuli)
-                    {
-                        DAC_part_2 = lastDAC + nDacChangeStep;
-                    } else
-                    {
-                        DAC_part_2 = lastDAC - nDacChangeStep;
-                    }
-                } else
-                {
-                    if(phaseAvg_part_1_B > 0)
-                    {
-                        DAC_part_2 = lastDAC + nDacChangeStep;
-                    } else
-                    {
-                        DAC_part_2 = lastDAC - nDacChangeStep;
-                    }
-                }
-                return DAC_part_2;
-            }
-            else if (nCounterPhase == 2 * VRIJEME_UMIRIVANJA + VRIJEME_MJERENJA_BLOKA) // proslo jos jedno vrijeme umirivanja poslije promjene DAC-a
-            {
-                nCounterPhase++;
-                phaseAvg_part_2_A = phaseExpAvg.calculateExpAvg(lastPhase); // Uzmimo tacku 3
-                writeServiceFile("Treca tacka: " + phaseAvg_part_2_A.ToString());
-                return DAC_part_2;
-            }
-            else if (nCounterPhase == 2 * (VRIJEME_UMIRIVANJA + VRIJEME_MJERENJA_BLOKA))  // End
-            {
-                phaseAvg_part_2_B = phaseExpAvg.calculateExpAvg(lastPhase); // Uzmimo tacku 4
-                writeServiceFile("Cetvrta tacka tacka: " + phaseAvg_part_2_B.ToString());
-                
-                double newDac = calculateDAC();
-                
-                state = MediumState.TUNING_SLEEP; // necemo mjeanjati DAC u narednih 100 sec.
-                return newDac;
-            }
-            else
-            {
-                nCounterPhase++;
-                phaseExpAvg.calculateExpAvg(lastPhase); // dodaj tacku u average
-                calculatedDAC = lastDAC;
-                return lastDAC;
-            }
-        }
-        */
+        }*/
+        
         private int calculateDacStep(double phaseAvg_part_1_B)
         {
             double absPart_1_B_ns = Math.Abs(phaseAvg_part_1_B)*Math.Pow(10,9);
             int nDacChangeStep;
 
-            if (absPart_1_B_ns < 5)
-                nDacChangeStep = 5;
+            if (absPart_1_B_ns < 4)  
+                nDacChangeStep = 1;   
+            if (absPart_1_B_ns < 8)  
+                nDacChangeStep = 2;
             else if (absPart_1_B_ns < 10)
-                nDacChangeStep = 10;
+                nDacChangeStep = 6;
+            else if (absPart_1_B_ns < 12)
+                nDacChangeStep = 9;
             else if (absPart_1_B_ns < 20)
                 nDacChangeStep = 15;
             else if (absPart_1_B_ns < 30)
@@ -230,8 +199,7 @@ namespace OCXO_App
             }
             return nDacChangeStep;
         }
-
-
+        /*
         private double calculateNewDac()
         {
             double newDAC = block_1.part_DAC - (block_1.phaseAvg_stop - block_1.phaseAvg_start) * (block_2.part_DAC - block_1.part_DAC) /
@@ -244,6 +212,25 @@ namespace OCXO_App
             calculatedDAC = newDAC;
             return calculatedDAC;
         }
+        */
+        private double calculateNewDac(int nTime)
+        {
+            if (slidingFrame_1.part_angle == slidingFrame_2.part_angle) // ako se ugao nije promjenio, dijelicemo sa nulom i dobiti beskonacan broj
+                return calculatedDAC; // vrati proslu vrijednost
+
+            double newDAC = DAC_frame_1 - (slidingFrame_1.phaseAvg_stop - slidingFrame_1.phaseAvg_start) * (DAC_frame_2 - DAC_frame_1) /
+                ((slidingFrame_2.phaseAvg_stop - slidingFrame_2.phaseAvg_start) - (slidingFrame_1.phaseAvg_stop - slidingFrame_1.phaseAvg_start));
+            writeServiceFile("Time: " + nTime + ". DAC_frame_1 = " + DAC_frame_1 + "phase: " + slidingFrame_1.phaseAvg_start + "//" + slidingFrame_1.phaseAvg_stop +
+                           ", DAC_frame_2 = " + DAC_frame_2 + "phase: " + slidingFrame_1.phaseAvg_start + "//" + slidingFrame_1.phaseAvg_stop);
+            writeServiceFile("Old DAC: " + calculatedDAC + ", New DAC: " + newDAC);
+            if (calculatedDAC != 0) // ako nije prvo mjerenje medium tuningcalculatedDAC-a:
+                writeServiceFile("Starenje u zadnjih " + FRAME_SIZE + " sec: " + (slidingFrame_2.phaseAvg_stop - slidingFrame_1.phaseAvg_stop));
+
+            calculatedDAC = newDAC;
+            return calculatedDAC;
+        }
+
+        
         /*
         private double calculateDAC()
         {
@@ -259,9 +246,14 @@ namespace OCXO_App
 
         public void resetMediumTuning()
         {
-            nCounterPhase = 0;
-            state = MediumState.MEASURING_BLOCK_1;
+            nCounterPhase = 0;         
             tunningSleepCounter = 0;
+
+            slidingFrame_1 = new SlidingFrame();
+            slidingFrame_1.init(30, 10);
+
+            slidingFrame_2 = new SlidingFrame();
+            slidingFrame_2.init(30, 10);
         }
 
         private void writeServiceFile(string str)

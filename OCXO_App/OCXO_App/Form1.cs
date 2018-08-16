@@ -179,6 +179,8 @@ namespace OCXO_App
             oldValue = newDacValue;
         }
 
+        int nTime = 0;
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Sljedece 3 funkcije bi trebalo prebaciti u neki "DacHandler.cs" ali to cemo drugi put. On bi primio kao argument objekt ove forme
         // i onda bi mogao osvjeziti graf kada obradi poruke
@@ -198,7 +200,7 @@ namespace OCXO_App
 
                     if (closedLoopFlag) //closed loop operation
                     {
-                        dac_value = calculateNewDACValue(inputData, lastPhase);
+                        dac_value = calculateNewDACValue(inputData, lastPhase, nTime);
 
                         // Send DAC (if changed) to FPGA
                         if (dac_value != oldValue)
@@ -217,7 +219,7 @@ namespace OCXO_App
             }
         }
 
-        private Int32 calculateNewDACValue(string input, double lastPhase)
+        private Int32 calculateNewDACValue(string input, double lastPhase, int nTime)
         {
             // "phase" nije u ns nego broj imupulsa counter-a (2.5 ili 5ns)
             double phase = Phase.calculatePhaseFromInputString_B(input);
@@ -226,7 +228,7 @@ namespace OCXO_App
             {
                 if (tuningState == TuningState.CROASE) // Grubo podesavanje
                 {
-                    double tmp = coarseTuneDAC(phase);
+                    double tmp = coarseTuneDAC(phase, nTime);
 
                     checkTuningState(lastPhase);  // change state to MEDIUM if phase low in last 100 measurements
 
@@ -234,9 +236,10 @@ namespace OCXO_App
                 }
                 else if (tuningState == TuningState.MEDIUM) // Srednje podesavanje
                 {
-                    TuningResult result =  mediumTuning.calculateMediumTuning(dac_value, lastPhase);
+                    TuningResult result = mediumTuning.calculateMediumTuning(dac_value, lastPhase, nTime);
                     if (result.stateResult == TuningResult.Result.FINISHED)
                     {
+                        writeServiceFile("Medium tuning finishe. Time: " + nTime + ". Setting new DAC value before starting fine tuning: " + result.newDAC);
                         tuningState = TuningState.FINE;
                     }
                     return Convert.ToInt32(result.newDAC);
@@ -252,7 +255,7 @@ namespace OCXO_App
                 }
                 else if (tuningState == TuningState.FINE) // fino podesavanje
                 {
-                    TuningResult result = fineTuning.tune(dac_value, lastPhase);
+                    TuningResult result = fineTuning.tune(dac_value, lastPhase, nTime);
                     if (result.stateResult == TuningResult.Result.FINISHED)// GO TO "AGING" state
                     {
                         tuningState = TuningState.AGEING;
@@ -287,7 +290,7 @@ namespace OCXO_App
             }
         }
 
-        private double coarseTuneDAC(double phase)
+        private double coarseTuneDAC(double phase, int nTime)
         {
             // remove first value from average before adding the new (if array is full)
             if (oldValues.Count == 499) //  == 499   Tek ako imamo 500, onda moramo jedan izbaciti
@@ -324,7 +327,14 @@ namespace OCXO_App
         }
 
 
-        
+        private void writeServiceFile(string str)
+        {
+            using (StreamWriter st = new StreamWriter("serviceFile.txt", true))
+            {
+                st.WriteLine(str);
+                st.Close();
+            }
+        }
         
 
         /*****************************************
