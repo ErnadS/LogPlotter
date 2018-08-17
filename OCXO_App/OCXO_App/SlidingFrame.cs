@@ -19,9 +19,7 @@ namespace OCXO_App
 
         double[] phaseArray; // klizna Array
         int totalFrameSize;  // ukupna duzina frame. Sastoji se od "averageSize" za racunicu prve tacke, pauze izmedju 2 tacke i jos jedne "averageSize" za drugu tacku
-        int averageSize;  // koliko elemenata se koristi da se izracuna tacka A1 ili A2
-
-        bool completed = false; 
+        int averageSize;  // koliko elemenata se koristi da se izracuna tacka A1 ili A2 
 
         public SlidingFrame()
         {
@@ -35,13 +33,13 @@ namespace OCXO_App
             this.averageSize = averageSize;
             phaseArray = new double[totalFrameSize];
 
-            completed = false;
+            finished = false;
         }
 
         public void clear()
         {
             nCounter = 0;
-            completed = false;
+            finished = false;
         }
 
         public void AddPoint(double phase)
@@ -54,21 +52,20 @@ namespace OCXO_App
                 }
 
                 phaseArray[totalFrameSize - 1] = phase; // dodaj novi element
-                completed = true;
+                finished = true;  // nije potrebno ovdje jer vec je bio "finished" dole kada je napunio array ali za svaki slucaj ...
             }
             else 
             {
                 nCounter++;  // povecavamo counter samo ako nije dosao do averageSize
                 phaseArray[totalFrameSize - nCounter - 1] = phase;
                 if (nCounter == averageSize) // upravo popunili array po prvi put
-                    completed = true;
+                    finished = true;
             }
 
-            if (completed)
+            if (finished)
             {
                 phaseAvg_start = AverageExp.calculateExpAvgFromArray(phaseArray, 0, averageSize);
                 phaseAvg_stop = AverageExp.calculateExpAvgFromArray(phaseArray, totalFrameSize - averageSize - 1, averageSize);
-                finished = true;//dodano
                 CalculateAngle();
             }
         }

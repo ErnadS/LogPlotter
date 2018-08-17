@@ -211,6 +211,8 @@ namespace OCXO_App
                         addDacToGraph(dac_value);
                         writeDacToFile(dac_value);
                     }
+
+                    nTime++;
                 }
                 catch(Exception e) 
                 {
