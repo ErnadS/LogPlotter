@@ -278,18 +278,19 @@ namespace OCXO_App
         {
             if (Math.Abs(phase) < 50  *Math.Pow(10, -9)) //Uslov za fino podesenje da je faza 100 sekundi manja od 5*2.5ns
             {
+                /*
                 counter++;
                 if (counter == 200)
-                {
+                {*/
                     tuningState = TuningState.MEDIUM;
 
                     label9.Text = "Medium Tuning ON";
-                }
+                //}
             }
-            else
+            /* else
             {
                 counter = 0;
-            }
+            }*/
         }
 
         private double coarseTuneDAC(double phase, int nTime)

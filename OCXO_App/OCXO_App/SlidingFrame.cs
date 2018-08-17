@@ -44,9 +44,9 @@ namespace OCXO_App
 
         public void AddPoint(double phase)
         {
-            if (nCounter == averageSize)
+            if (nCounter == totalFrameSize)
             {
-                for (int i = 0; i < totalFrameSize-1; i++) // izbaci prvi element i prekopiraj clanove uljevo
+                for (int i = 0; i < totalFrameSize - 1; i++) // izbaci prvi element i prekopiraj clanove uljevo
                 {
                     phaseArray[i] = phaseArray[i + 1];
                 }
@@ -54,11 +54,12 @@ namespace OCXO_App
                 phaseArray[totalFrameSize - 1] = phase; // dodaj novi element
                 finished = true;  // nije potrebno ovdje jer vec je bio "finished" dole kada je napunio array ali za svaki slucaj ...
             }
-            else 
+            else
             {
+                phaseArray[nCounter] = phase;
                 nCounter++;  // povecavamo counter samo ako nije dosao do averageSize
-                phaseArray[totalFrameSize - nCounter - 1] = phase;
-                if (nCounter == averageSize) // upravo popunili array po prvi put
+
+                if (nCounter == totalFrameSize) // upravo popunili array po prvi put
                     finished = true;
             }
 
