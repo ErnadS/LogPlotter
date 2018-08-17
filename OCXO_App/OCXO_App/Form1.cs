@@ -274,10 +274,10 @@ namespace OCXO_App
 
         private void checkTuningState(double phase)
         {
-            if (Math.Abs(phase) < 200  *Math.Pow(10, -9)) //Uslov za fino podesenje da je faza 100 sekundi manja od 5*2.5ns
+            if (Math.Abs(phase) < 50  *Math.Pow(10, -9)) //Uslov za fino podesenje da je faza 100 sekundi manja od 5*2.5ns
             {
                 counter++;
-                if (counter == 50)
+                if (counter == 200)
                 {
                     tuningState = TuningState.MEDIUM;
 

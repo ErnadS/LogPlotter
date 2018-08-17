@@ -68,7 +68,7 @@ namespace OCXO_App
             {
                 phaseAvg_start = AverageExp.calculateExpAvgFromArray(phaseArray, 0, averageSize);
                 phaseAvg_stop = AverageExp.calculateExpAvgFromArray(phaseArray, totalFrameSize - averageSize - 1, averageSize);
-
+                finished = true;//dodano
                 CalculateAngle();
             }
         }
