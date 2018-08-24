@@ -493,5 +493,52 @@ namespace OCXO_App
                 dv.Close();
             }
         }
+
+        private void tempStartLog_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                serialOCXOPort = new SerialPort(dacComPort.Text, 57600);
+                serialOCXOPort.Open();
+                t = new Thread(LogTemperature);
+                t.Start();
+                stopwatch.Start();
+            }
+            catch (Exception) { }
+        }
+
+        private void LogTemperature()
+        {
+            while (serialOCXOPort.IsOpen)
+            {
+                try
+                {
+                    serialOCXOPort.Write("!T\r\n");
+                    string temperature = serialOCXOPort.ReadLine();
+                    writeTempToFile(temperature);
+                    while(stopwatch.ElapsedMilliseconds < 60000)
+                    {
+                        //wait 60 sec
+                    }
+                    stopwatch.Restart();
+                }
+                catch(Exception) { }
+            }
+        }
+
+        private void writeTempToFile(string temp)
+        {
+            using (StreamWriter tmp = new StreamWriter("temperature.txt", true))
+            {
+                tmp.WriteLine(temp);
+                tmp.Close();
+            }
+        }
+
+        private void tempStopLog_Click(object sender, EventArgs e)
+        {
+            serialOCXOPort.Close();
+            stopwatch.Stop();
+        }
     }
 }

@@ -54,6 +54,9 @@
             this.label8 = new System.Windows.Forms.Label();
             this.currentPhaseValue = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.tempStartLog = new System.Windows.Forms.Button();
+            this.tempStopLog = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // cartesianChart1
@@ -293,11 +296,43 @@
             this.label9.TabIndex = 25;
             this.label9.Text = "Medium tuning OFF";
             // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(111, 671);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(105, 13);
+            this.label10.TabIndex = 26;
+            this.label10.Text = "Temperature Loging:";
+            // 
+            // tempStartLog
+            // 
+            this.tempStartLog.Location = new System.Drawing.Point(86, 687);
+            this.tempStartLog.Name = "tempStartLog";
+            this.tempStartLog.Size = new System.Drawing.Size(75, 23);
+            this.tempStartLog.TabIndex = 27;
+            this.tempStartLog.Text = "Start Log";
+            this.tempStartLog.UseVisualStyleBackColor = true;
+            this.tempStartLog.Click += new System.EventHandler(this.tempStartLog_Click);
+            // 
+            // tempStopLog
+            // 
+            this.tempStopLog.Location = new System.Drawing.Point(170, 687);
+            this.tempStopLog.Name = "tempStopLog";
+            this.tempStopLog.Size = new System.Drawing.Size(75, 23);
+            this.tempStopLog.TabIndex = 28;
+            this.tempStopLog.Text = "Stop Log";
+            this.tempStopLog.UseVisualStyleBackColor = true;
+            this.tempStopLog.Click += new System.EventHandler(this.tempStopLog_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1852, 915);
+            this.Controls.Add(this.tempStopLog);
+            this.Controls.Add(this.tempStartLog);
+            this.Controls.Add(this.label10);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.currentPhaseValue);
             this.Controls.Add(this.label8);
@@ -359,6 +394,9 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox currentPhaseValue;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Button tempStartLog;
+        private System.Windows.Forms.Button tempStopLog;
     }
 }
 
