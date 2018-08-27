@@ -176,13 +176,15 @@ namespace OCXO_App
             double absPart_1_B_ns = Math.Abs(phaseAvg_part_1_B)*Math.Pow(10,9);
             int nDacChangeStep;
 
-            if (absPart_1_B_ns < 4)  
+            if (absPart_1_B_ns < 3)
+                nDacChangeStep = 0;
+            if (absPart_1_B_ns < 6)  
                 nDacChangeStep = 1;   
             if (absPart_1_B_ns < 8)  
                 nDacChangeStep = 2;
-            else if (absPart_1_B_ns < 10)
-                nDacChangeStep = 6;
             else if (absPart_1_B_ns < 12)
+                nDacChangeStep = 6;
+            else if (absPart_1_B_ns < 14)
                 nDacChangeStep = 9;
             else if (absPart_1_B_ns < 20)
                 nDacChangeStep = 15;
