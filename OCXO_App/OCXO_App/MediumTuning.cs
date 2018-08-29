@@ -219,7 +219,7 @@ namespace OCXO_App
         {
             if (slidingFrame_1.part_angle == slidingFrame_2.part_angle) // ako se ugao nije promjenio, dijelicemo sa nulom i dobiti beskonacan broj
                 return calculatedDAC; // vrati proslu vrijednost
-
+            
             double newDAC = DAC_frame_1 - (slidingFrame_1.phaseAvg_stop - slidingFrame_1.phaseAvg_start) * (DAC_frame_2 - DAC_frame_1) /
                 ((slidingFrame_2.phaseAvg_stop - slidingFrame_2.phaseAvg_start) - (slidingFrame_1.phaseAvg_stop - slidingFrame_1.phaseAvg_start));
             writeServiceFile("Time: " + nTime + ". DAC_frame_1 = " + DAC_frame_1 + "phase: " + slidingFrame_1.phaseAvg_start + "//" + slidingFrame_1.phaseAvg_stop +

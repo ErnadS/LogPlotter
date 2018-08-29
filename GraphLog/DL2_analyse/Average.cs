@@ -17,6 +17,9 @@ namespace GraphLog.DL2_analyse
 
         public float calculateAvg(float fNextInput)
         {
+            if (float.IsNaN(fNextInput))
+                return previousOutputValue;
+
             m_sampleCount++;
 
             if (m_sampleCount < AVG_SIZE)
