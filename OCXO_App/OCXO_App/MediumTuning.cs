@@ -23,8 +23,12 @@ namespace OCXO_App
         double DAC_part_1;
         double DAC_part_2;
         */
+<<<<<<< HEAD
         //MediumTuningResult block_1 = new MediumTuningResult();
         //MediumTuningResult block_2 = new MediumTuningResult();
+=======
+     
+>>>>>>> 26742e842aecb5191e9ba7f4544b2168f61bce5d
 
         int nCounterPhase = 0;
 
@@ -44,6 +48,7 @@ namespace OCXO_App
         int tunningSleepCounter = 0;
 
         double calculatedDAC = 0;  // ovu bi trebali resetovati kada ispadne iz medium tuninga (ili samo napraviti novi objekat ove klase?)
+        double lastOptimalDac = 0;
 
         enum MediumState
         {
@@ -91,6 +96,19 @@ namespace OCXO_App
 
                 if (slidingFrame_1.finished) //   measure_blocks_1(lastDAC, lastPhase))
                 {
+                    double crossingZeroTime = getZerroCrosingTime();
+                    if (crossingZeroTime < TUNNING_SLEEP_TIME + FRAME_SIZE)
+                    {
+                        if (lastOptimalDac != 0)
+                        {
+                            calculatedDAC = lastOptimalDac; // Crossing zero soon. Set optimal dac and do not make a measure block 2
+                            state = MediumState.TUNING_SLEEP_1; // do not go to tuning state 2 (back to start). 
+                            tunningSleepCounter = 0;
+                            writeServiceFile("Time: " + nTime + ". crossingZeroTime = " + crossingZeroTime + ". New DAC = " + lastOptimalDac);
+                            return new TuningResult(lastOptimalDac, TuningResult.Result.NOT_FINISHED);
+                        }
+                    }
+
                     state = MediumState.TUNING_SLEEP_2; //  MEASURING_BLOCK_2;
                     calculatedDAC = lastDAC + calculateDacStep(slidingFrame_1.phaseAvg_stop); //   block_1.phaseAvg_stop);
                     DAC_frame_2 = calculatedDAC;
@@ -183,11 +201,9 @@ namespace OCXO_App
             if (absPart_1_B_ns < 8)  
                 nDacChangeStep = 2;
             else if (absPart_1_B_ns < 12)
-                nDacChangeStep = 6;
-            else if (absPart_1_B_ns < 14)
-                nDacChangeStep = 9;
+                nDacChangeStep = 4;
             else if (absPart_1_B_ns < 20)
-                nDacChangeStep = 15;
+                nDacChangeStep = 9;
             else if (absPart_1_B_ns < 30)
                 nDacChangeStep = 20;
             else if (absPart_1_B_ns < 100)
@@ -222,13 +238,14 @@ namespace OCXO_App
             
             double newDAC = DAC_frame_1 - (slidingFrame_1.phaseAvg_stop - slidingFrame_1.phaseAvg_start) * (DAC_frame_2 - DAC_frame_1) /
                 ((slidingFrame_2.phaseAvg_stop - slidingFrame_2.phaseAvg_start) - (slidingFrame_1.phaseAvg_stop - slidingFrame_1.phaseAvg_start));
-            writeServiceFile("Time: " + nTime + ". DAC_frame_1 = " + DAC_frame_1 + "phase: " + slidingFrame_1.phaseAvg_start + "//" + slidingFrame_1.phaseAvg_stop +
-                           ", DAC_frame_2 = " + DAC_frame_2 + "phase: " + slidingFrame_1.phaseAvg_start + "//" + slidingFrame_1.phaseAvg_stop);
+            writeServiceFile("Time: " + nTime + ". DAC_frame_1 = " + DAC_frame_1 + "start: " + slidingFrame_1.phaseAvg_start + ", stop: " + slidingFrame_1.phaseAvg_stop +
+                           ", DAC_frame_2 = " + DAC_frame_2 + "start: " + slidingFrame_2.phaseAvg_start + ", stop: " + slidingFrame_2.phaseAvg_stop);
             writeServiceFile("Old DAC: " + calculatedDAC + ", New DAC: " + newDAC);
             if (calculatedDAC != 0) // ako nije prvo mjerenje medium tuningcalculatedDAC-a:
                 writeServiceFile("Starenje u zadnjih " + FRAME_SIZE + " sec: " + (slidingFrame_2.phaseAvg_stop - slidingFrame_1.phaseAvg_stop));
 
             calculatedDAC = newDAC;
+            lastOptimalDac = newDAC; // TODO: imamo previse varijabli. "calculatedDAC bi trebao biti moznda "lastDac" a izracunati: "optimalDAC" ...
             return calculatedDAC;
         }
 
@@ -265,6 +282,16 @@ namespace OCXO_App
                 st.WriteLine(str);
                 st.Close();
             }
+        }
+
+        double getZerroCrosingTime()
+        {
+            double x1 = 0;
+            double x2 = AVG_TIME;
+            double y1 = slidingFrame_2.phaseAvg_start;
+            double y2 = slidingFrame_2.phaseAvg_stop;
+            double x = x1 - y1 * (x2 - x1) / (y2 - y1);
+            return x;
         }
     }
 }

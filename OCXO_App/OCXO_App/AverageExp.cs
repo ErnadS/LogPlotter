@@ -16,7 +16,7 @@ namespace OCXO_App
         double outputValue;
 
         public const int AVG_SIZE = 10;
-        const double ALPHA_NORMAL = 0.1;  // mora biti izmedju 0 i 1. Sto je manji, nova vrijednost utice manje na rezultat
+        const double ALPHA_NORMAL = 0.4;  // mora biti izmedju 0 i 1. Sto je manji, nova vrijednost utice manje na rezultat
 
         int avg_size;
         double alpha_normal;
