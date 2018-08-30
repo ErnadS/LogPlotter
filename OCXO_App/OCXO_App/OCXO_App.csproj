@@ -89,7 +89,6 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="MediumTuning.cs" />
-    <Compile Include="MediumTuningResult.cs" />
     <Compile Include="Phase.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
