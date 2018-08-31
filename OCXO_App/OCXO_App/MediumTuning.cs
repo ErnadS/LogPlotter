@@ -133,6 +133,22 @@ namespace OCXO_App
 
                 if (slidingFrame_2.finished) //measure_blocks_2(lastDAC, lastPhase))  // zavrsio oba bloka
                 {
+                    if (DAC_frame_1 < DAC_frame_2) {  // podigli smo DAC, faza bi trebala da opada u part 2
+                        if (slidingFrame_2.part_angle > slidingFrame_1.part_angle) // !!! NIJE KAO OCEKIVANO, faza porasla
+                        {
+                            calculatedDAC = lastDAC + calculateDacStep(slidingFrame_2.phaseAvg_stop);
+                            return new TuningResult(calculatedDAC, TuningResult.Result.NOT_FINISHED);
+                        }
+                    }
+                    else if (DAC_frame_1 > DAC_frame_2)
+                    {  // smanjil smo DAC, faza bi trebala da raste u part 2
+                        if (slidingFrame_2.part_angle < slidingFrame_1.part_angle) // !!! NIJE KAO OCEKIVANO, faza opala
+                        {
+                            calculatedDAC = lastDAC + calculateDacStep(slidingFrame_2.phaseAvg_stop);
+                            return new TuningResult(calculatedDAC, TuningResult.Result.NOT_FINISHED);
+                        }
+                    }
+
                     calculateNewDac(nTime);
 
                     // TESTIRAMO MEDIUM. NECEMO ICI U FINE TUNINIG
@@ -236,8 +252,11 @@ namespace OCXO_App
             
             double newDAC = DAC_frame_1 - (slidingFrame_1.phaseAvg_stop - slidingFrame_1.phaseAvg_start) * (DAC_frame_2 - DAC_frame_1) /
                 ((slidingFrame_2.phaseAvg_stop - slidingFrame_2.phaseAvg_start) - (slidingFrame_1.phaseAvg_stop - slidingFrame_1.phaseAvg_start));
-            writeServiceFile("Time: " + nTime + ". DAC_frame_1 = " + DAC_frame_1 + "start: " + slidingFrame_1.phaseAvg_start + ", stop: " + slidingFrame_1.phaseAvg_stop +
-                           ", DAC_frame_2 = " + DAC_frame_2 + "start: " + slidingFrame_2.phaseAvg_start + ", stop: " + slidingFrame_2.phaseAvg_stop);
+
+            writeServiceFile("Time: " + nTime + 
+                            ".\tDAC_frame_1 = " + DAC_frame_1 + " start: " + slidingFrame_1.phaseAvg_start + ", stop: " + slidingFrame_1.phaseAvg_stop + ", angle: " + slidingFrame_1.part_angle +
+                           "\t\tDAC_frame_2 = " + DAC_frame_2 + " start: " + slidingFrame_2.phaseAvg_start + ", stop: " + slidingFrame_2.phaseAvg_stop + ", angle: " + slidingFrame_2.part_angle);
+            
             writeServiceFile("Old DAC: " + calculatedDAC + ", New DAC: " + newDAC);
             if (calculatedDAC != 0) // ako nije prvo mjerenje medium tuningcalculatedDAC-a:
                 writeServiceFile("Starenje u zadnjih " + FRAME_SIZE + " sec: " + (slidingFrame_2.phaseAvg_stop - slidingFrame_1.phaseAvg_stop));
