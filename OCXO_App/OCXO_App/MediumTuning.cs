@@ -137,6 +137,12 @@ namespace OCXO_App
                         if (slidingFrame_2.part_angle > slidingFrame_1.part_angle) // !!! NIJE KAO OCEKIVANO, faza porasla
                         {
                             calculatedDAC = lastDAC + calculateDacStep(slidingFrame_2.phaseAvg_stop);
+
+                            writeServiceFile("!!! GRESKA_1: Time: " + nTime +
+                            ".\tDAC_frame_1 = " + DAC_frame_1 + " start: " + slidingFrame_1.phaseAvg_start + ", stop: " + slidingFrame_1.phaseAvg_stop + ", angle: " + slidingFrame_1.part_angle +
+                           "\t\tDAC_frame_2 = " + DAC_frame_2 + " start: " + slidingFrame_2.phaseAvg_start + ", stop: " + slidingFrame_2.phaseAvg_stop + ", angle: " + slidingFrame_2.part_angle);
+
+                            writeServiceFile("GRESKA_1 novi DAC: " + calculatedDAC);
                             return new TuningResult(calculatedDAC, TuningResult.Result.NOT_FINISHED);
                         }
                     }
@@ -145,6 +151,13 @@ namespace OCXO_App
                         if (slidingFrame_2.part_angle < slidingFrame_1.part_angle) // !!! NIJE KAO OCEKIVANO, faza opala
                         {
                             calculatedDAC = lastDAC + calculateDacStep(slidingFrame_2.phaseAvg_stop);
+
+                            writeServiceFile("!!! GRESKA_2: Time: " + nTime +
+                            ".\tDAC_frame_1 = " + DAC_frame_1 + " start: " + slidingFrame_1.phaseAvg_start + ", stop: " + slidingFrame_1.phaseAvg_stop + ", angle: " + slidingFrame_1.part_angle +
+                           "\t\tDAC_frame_2 = " + DAC_frame_2 + " start: " + slidingFrame_2.phaseAvg_start + ", stop: " + slidingFrame_2.phaseAvg_stop + ", angle: " + slidingFrame_2.part_angle);
+
+                            writeServiceFile("GRESKA_2 novi DAC: " + calculatedDAC);
+
                             return new TuningResult(calculatedDAC, TuningResult.Result.NOT_FINISHED);
                         }
                     }
