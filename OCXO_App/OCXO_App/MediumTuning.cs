@@ -23,12 +23,10 @@ namespace OCXO_App
         double DAC_part_1;
         double DAC_part_2;
         */
-<<<<<<< HEAD
+
         //MediumTuningResult block_1 = new MediumTuningResult();
         //MediumTuningResult block_2 = new MediumTuningResult();
-=======
-     
->>>>>>> 26742e842aecb5191e9ba7f4544b2168f61bce5d
+
 
         int nCounterPhase = 0;
 
