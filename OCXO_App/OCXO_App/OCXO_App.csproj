@@ -81,6 +81,7 @@
     <Compile Include="Ageing.cs" />
     <Compile Include="AverageExp.cs" />
     <Compile Include="AverageMoving.cs" />
+    <Compile Include="AverageNormal.cs" />
     <Compile Include="FineTuning.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

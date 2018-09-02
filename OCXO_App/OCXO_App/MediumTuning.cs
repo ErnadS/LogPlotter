@@ -147,6 +147,8 @@ namespace OCXO_App
                            "\t\tDAC_frame_2 = " + DAC_frame_2 + " start: " + slidingFrame_2.phaseAvg_start + ", stop: " + slidingFrame_2.phaseAvg_stop + ", angle: " + slidingFrame_2.part_angle);
 
                             writeServiceFile("GRESKA_1 novi DAC: " + calculatedDAC);
+                            state = MediumState.TUNING_SLEEP_1;
+
                             return new TuningResult(calculatedDAC, TuningResult.Result.NOT_FINISHED);
                         }
                     }
@@ -161,6 +163,7 @@ namespace OCXO_App
                            "\t\tDAC_frame_2 = " + DAC_frame_2 + " start: " + slidingFrame_2.phaseAvg_start + ", stop: " + slidingFrame_2.phaseAvg_stop + ", angle: " + slidingFrame_2.part_angle);
 
                             writeServiceFile("GRESKA_2 novi DAC: " + calculatedDAC);
+                            state = MediumState.TUNING_SLEEP_1;
 
                             return new TuningResult(calculatedDAC, TuningResult.Result.NOT_FINISHED);
                         }
@@ -272,7 +275,7 @@ namespace OCXO_App
 
             writeServiceFile("Time: " + nTime + 
                             ".\tDAC_frame_1 = " + DAC_frame_1 + " start: " + slidingFrame_1.phaseAvg_start + ", stop: " + slidingFrame_1.phaseAvg_stop + ", angle: " + slidingFrame_1.part_angle +
-                           "\t\tDAC_frame_2 = " + DAC_frame_2 + " start: " + slidingFrame_2.phaseAvg_start + ", stop: " + slidingFrame_2.phaseAvg_stop + ", angle: " + slidingFrame_2.part_angle);
+                           "\r\n\t\tDAC_frame_2 = " + DAC_frame_2 + " start: " + slidingFrame_2.phaseAvg_start + ", stop: " + slidingFrame_2.phaseAvg_stop + ", angle: " + slidingFrame_2.part_angle);
             
             writeServiceFile("Old DAC: " + calculatedDAC + ", New DAC: " + newDAC);
             if (calculatedDAC != 0) // ako nije prvo mjerenje medium tuningcalculatedDAC-a:
