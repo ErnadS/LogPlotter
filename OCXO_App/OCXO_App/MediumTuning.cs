@@ -103,6 +103,10 @@ namespace OCXO_App
                             return new TuningResult(lastOptimalDac, TuningResult.Result.NOT_FINISHED);
                         }
                     }
+                    else
+                    {
+                        writeServiceFile("Time: " + nTime + ". crossingZeroTime not soon = " + crossingZeroTime + ". Measure block 2");
+                    }
 
                     state = MediumState.TUNING_SLEEP_2; //  MEASURING_BLOCK_2;
                     calculatedDAC = lastDAC + calculateDacStep(slidingFrame_1.phaseAvg_stop); //   block_1.phaseAvg_stop);
@@ -282,7 +286,7 @@ namespace OCXO_App
         double getZerroCrosingTime()
         {
             double x1 = 0;
-            double x2 = AVG_TIME;
+            double x2 = FRAME_SIZE - AVG_TIME;
             double y1 = slidingFrame_2.phaseAvg_start;
             double y2 = slidingFrame_2.phaseAvg_stop;
             double x = x1 - y1 * (x2 - x1) / (y2 - y1);
