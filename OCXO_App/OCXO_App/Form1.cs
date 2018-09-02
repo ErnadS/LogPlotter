@@ -196,7 +196,6 @@ namespace OCXO_App
                     double lastPhase = Phase.calculatePhaseFromInputString(inputData);
 
                     addPhaseToGraph(lastPhase);
-                    writePhaseToFile(lastPhase);
 
                     if (closedLoopFlag) //closed loop operation
                     {
@@ -210,6 +209,7 @@ namespace OCXO_App
 
                         addDacToGraph(dac_value);
                         writeDacToFile(dac_value);
+                        writePhaseToFile(lastPhase);
                     }
 
                     nTime++;
