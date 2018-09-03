@@ -95,7 +95,7 @@ namespace OCXO_App
                 if (slidingFrame_1.finished) //   measure_blocks_1(lastDAC, lastPhase))
                 {
                     double crossingZeroTime = getZerroCrosingTime();
-                    if (crossingZeroTime < TUNNING_SLEEP_TIME + FRAME_SIZE)
+                    if (crossingZeroTime < TUNNING_SLEEP_TIME + FRAME_SIZE )
                     {
                         if (lastOptimalDac != 0)
                         {
@@ -105,6 +105,10 @@ namespace OCXO_App
                             writeServiceFile("Time: " + nTime + ". crossingZeroTime = " + crossingZeroTime + ". New DAC = " + lastOptimalDac);
                             return new TuningResult(lastOptimalDac, TuningResult.Result.NOT_FINISHED);
                         }
+                    }
+                    else
+                    {
+                        writeServiceFile("Time: " + nTime + ". crossingZeroTime not soon = " + crossingZeroTime + ". Measure block 2");
                     }
 
                     state = MediumState.TUNING_SLEEP_2; //  MEASURING_BLOCK_2;
@@ -143,6 +147,8 @@ namespace OCXO_App
                            "\t\tDAC_frame_2 = " + DAC_frame_2 + " start: " + slidingFrame_2.phaseAvg_start + ", stop: " + slidingFrame_2.phaseAvg_stop + ", angle: " + slidingFrame_2.part_angle);
 
                             writeServiceFile("GRESKA_1 novi DAC: " + calculatedDAC);
+                            state = MediumState.TUNING_SLEEP_1;
+
                             return new TuningResult(calculatedDAC, TuningResult.Result.NOT_FINISHED);
                         }
                     }
@@ -157,6 +163,7 @@ namespace OCXO_App
                            "\t\tDAC_frame_2 = " + DAC_frame_2 + " start: " + slidingFrame_2.phaseAvg_start + ", stop: " + slidingFrame_2.phaseAvg_stop + ", angle: " + slidingFrame_2.part_angle);
 
                             writeServiceFile("GRESKA_2 novi DAC: " + calculatedDAC);
+                            state = MediumState.TUNING_SLEEP_1;
 
                             return new TuningResult(calculatedDAC, TuningResult.Result.NOT_FINISHED);
                         }
@@ -268,7 +275,7 @@ namespace OCXO_App
 
             writeServiceFile("Time: " + nTime + 
                             ".\tDAC_frame_1 = " + DAC_frame_1 + " start: " + slidingFrame_1.phaseAvg_start + ", stop: " + slidingFrame_1.phaseAvg_stop + ", angle: " + slidingFrame_1.part_angle +
-                           "\t\tDAC_frame_2 = " + DAC_frame_2 + " start: " + slidingFrame_2.phaseAvg_start + ", stop: " + slidingFrame_2.phaseAvg_stop + ", angle: " + slidingFrame_2.part_angle);
+                           "\r\n\t\tDAC_frame_2 = " + DAC_frame_2 + " start: " + slidingFrame_2.phaseAvg_start + ", stop: " + slidingFrame_2.phaseAvg_stop + ", angle: " + slidingFrame_2.part_angle);
             
             writeServiceFile("Old DAC: " + calculatedDAC + ", New DAC: " + newDAC);
             if (calculatedDAC != 0) // ako nije prvo mjerenje medium tuningcalculatedDAC-a:
@@ -317,9 +324,9 @@ namespace OCXO_App
         double getZerroCrosingTime()
         {
             double x1 = 0;
-            double x2 = AVG_TIME;
-            double y1 = slidingFrame_2.phaseAvg_start;
-            double y2 = slidingFrame_2.phaseAvg_stop;
+            double x2 = FRAME_SIZE - AVG_TIME;
+            double y1 = slidingFrame_1.phaseAvg_start;
+            double y2 = slidingFrame_1.phaseAvg_stop;
             double x = x1 - y1 * (x2 - x1) / (y2 - y1);
             return x;
         }

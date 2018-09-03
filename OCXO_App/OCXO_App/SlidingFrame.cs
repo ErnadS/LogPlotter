@@ -65,8 +65,8 @@ namespace OCXO_App
 
             if (finished)
             {
-                phaseAvg_start = AverageExp.calculateExpAvgFromArray(phaseArray, 0, averageSize);
-                phaseAvg_stop = AverageExp.calculateExpAvgFromArray(phaseArray, totalFrameSize - averageSize - 1, averageSize);
+                phaseAvg_start = /*AverageExp*/AverageNormal.calculateExpAvgFromArray(phaseArray, 0, averageSize);
+                phaseAvg_stop = /*AverageExp*/AverageNormal.calculateExpAvgFromArray(phaseArray, totalFrameSize - averageSize - 1, averageSize);
                 CalculateAngle();
             }
         }
