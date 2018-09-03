@@ -95,7 +95,7 @@ namespace OCXO_App
                 if (slidingFrame_1.finished) //   measure_blocks_1(lastDAC, lastPhase))
                 {
                     double crossingZeroTime = getZerroCrosingTime();
-                    if (crossingZeroTime < TUNNING_SLEEP_TIME + FRAME_SIZE )
+                    if (crossingZeroTime >= 0 && crossingZeroTime < TUNNING_SLEEP_TIME + FRAME_SIZE)
                     {
                         if (lastOptimalDac != 0)
                         {
@@ -323,11 +323,13 @@ namespace OCXO_App
 
         double getZerroCrosingTime()
         {
-            double x1 = 0;
             double x2 = FRAME_SIZE - AVG_TIME;
             double y1 = slidingFrame_1.phaseAvg_start;
             double y2 = slidingFrame_1.phaseAvg_stop;
-            double x = x1 - y1 * (x2 - x1) / (y2 - y1);
+            if (y2 == y1)
+                return 1000000000; // just return big number (never crossing zero)
+
+            double x = x2 * y2 / ((y1 - y2)); 
             return x;
         }
     }
