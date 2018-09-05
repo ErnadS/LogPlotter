@@ -12,13 +12,13 @@ namespace OCXO_App
         int smallPhasecounter = 0;
         double oldPhase = 0;
         //AverageExp phaseAverageExp = new AverageExp();
-        SlidingFrame phaseAverageExp = new SlidingFrame();
+        SlidingFrame phaseAverageExp;
         bool firstTime = true;
         double phaseAverage = 0;
 
         private const int GOOD_PHASE  = 4; 
         private const int GOOD_ANGLE  = 2;
-
+        /*
         const int TOTAL_FRAME_SIZE = 100;
         const int AVERAGING_SIZE = 30; // da li ovo treba smanjiti? ranije smo uzimali 10 za average
 
@@ -29,8 +29,28 @@ namespace OCXO_App
         int optimalDac = 0;  // ovo je srednja vrijednost od "lastConstDAC" elemenata
 
         int nTimeFromPreviousConstDAC;
+        */
+
+        const int TUNNING_SLEEP_TIME = 10; // ovdje je krace nego u medium, ocekujemo manje promjene dac-a i brze normalizovanje
+        const int FRAME_SIZE = 20;   // u jednom frame mjerimo 2 AVG_TIME bez pauze izmedju
+        const int AVG_TIME = 10;
+
+   
+
+        enum MediumState
+        {
+            TUNING_SLEEP,  // kada ne diramo DAC 
+            MEASURING_BLOCK_1,
+            FINISHED
+        }
 
 
+        public FineTuning()
+        {
+            phaseAverageExp = new SlidingFrame();
+            nCounter = 0;
+        }
+        /*
         private void updateConstandDacArray(int lastDAC, int nTime) // u ovu array ubacujemo DAC za koji imamo konstantnu fazu (bez obzira da li je trenutna faza daleko od nule).
         {
             if (nTimeFromPreviousConstDAC >= IGNORING_CONST_DAC_COUNT) // ako je od proslog "idealnog DAC-a" proslo dovoljno vremena (minimalno averaging time), onda cemo prihvatiti novi "idealni DAC" ako se desi
@@ -58,79 +78,62 @@ namespace OCXO_App
                 nTimeFromPreviousConstDAC++;
             }
         }
-
+        */
 
         public TuningResult tune(double lastDAC, double lastPhase, int nTime)
         {
-            if (firstTime)
-            {
-                phaseAverageExp.init(TOTAL_FRAME_SIZE, AVERAGING_SIZE);  
-                firstTime = false;
-
-                nTimeFromPreviousConstDAC = IGNORING_CONST_DAC_COUNT; // Ovo je prvi put. Zelimo da prihvatimo "optimalan DAC" ako naidje u samom startu
-            }
-            
             phaseAverageExp.AddPoint(lastPhase);
-            nCounter ++;
+            nCounter++;
 
-            updateConstandDacArray((int)lastDAC, nTime);
-
-            if (optimalDac != 0) // ako imamo izracunat optimalni
+            if (nCounter < TUNNING_SLEEP_TIME)
             {
-                if (Math.Abs(phaseAverageExp.phaseAvg_stop) <= GOOD_PHASE * Math.Pow(10,-9)) // usli smo unutar zadovoljavajuce faze
-                {
-                    nCounter = 0;
-                    return new TuningResult(optimalDac, TuningResult.Result.NOT_FINISHED); // ovdje je malo glupo da koristimo "NOT_FINISHED" ... Vjerovatno bi trebali samo dac je ovjde nema zavrsenog stanja?
-                }
+                return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED); // nemoj nista mijenjati
             }
 
-            if (nCounter == 100) {
+            // updateConstandDacArray((int)lastDAC, nTime);
+
+            if (nCounter == TUNNING_SLEEP_TIME + FRAME_SIZE)
+            {
                 nCounter = 0;
-                // TODO: izbaci ove komentare ako nisu vazni:
-                /*
-                if (phaseAverageExp.phaseAvg_stop < 0)
+
+                if (Math.Abs(phaseAverageExp.phaseAvg_stop) < 2.8 * Math.Pow(10, -9))
                 {
-                    if(Math.Abs(phaseAverageExp.phaseAvg_start) < Math.Abs(phaseAverageExp.phaseAvg_stop)) { lastDAC--; }
-                    //return new TuningResult(lastDAC - 1, TuningResult.Result.NOT_FINISHED);  // aging (+1)
+                    writeServiceFile("FT: |phase| <2.8, do nothing");
+                    return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED); // nemoj nista mijenjati
+                }
+                    // PHASE IS POSITIVE
+                else if (phaseAverageExp.phaseAvg_stop > 2.8 * Math.Pow(10, -9))
+                {
+                    if (phaseAverageExp.part_angle < 0) // ide prema nuli
+                    {
+                        writeServiceFile("FT: phase positive, going to zero, do nothing. New dac: " + lastDAC);
+                        return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED);
+                    }
+                    else
+                    {
+                        writeServiceFile("FT: phase positive, not going to zero, do nothing. New dac: " + (lastDAC + 1));
+                        return new TuningResult(lastDAC + 1, TuningResult.Result.NOT_FINISHED);
+                    }
                 }
                 else
                 {
-                    if (Math.Abs(phaseAverageExp.phaseAvg_start) < Math.Abs(phaseAverageExp.phaseAvg_stop)) { lastDAC++; }
-                    //return new TuningResult(lastDAC + 1, TuningResult.Result.NOT_FINISHED);
-                }
-                //oldPhase = Math.Abs(phaseAverage);
-                */
-                if(Math.Abs(phaseAverageExp.phaseAvg_stop) < 8*Math.Pow(10,-9) && Math.Abs(phaseAverageExp.part_angle) < 4)
-                {
-                    //do nothing
-                }
-                else if(Math.Abs(phaseAverageExp.phaseAvg_stop) > 8 * Math.Pow(10, -9))
-                {
-                    if(phaseAverageExp.phaseAvg_stop > 7 * Math.Pow(10, -9))
+                    if (phaseAverageExp.part_angle > 0) // ide prema nuli
                     {
-                        if (phaseAverageExp.part_angle > 4)   // TODO: ove konstane "4" itd treba vidjeti da li je to isto kao i "GOOD_ANGLE * 2" pa zamjeniti. Trebamo one 3-4 konstante u pocetku klase ubaciti svugdje u slucaju da budemo mijenjali
-                        {
-                            lastDAC += 2;  
-                        }
-                        else if(phaseAverageExp.part_angle > 0)
-                        {
-                            lastDAC += 1;
-                        }
+                        writeServiceFile("FT: phase negative, going to zero, do nothing. New dac: " + lastDAC);
+                        return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED);
                     }
-                    else if(phaseAverageExp.phaseAvg_stop < -7 * Math.Pow(10, -9))
+                    else
                     {
-                        if (phaseAverageExp.part_angle < -4)
-                        {
-                            lastDAC -= 2;
-                        }
-                        else if (phaseAverageExp.part_angle < 0)
-                        {
-                            lastDAC -= 1;
-                        }
+                        writeServiceFile("FT: phase negative, not going to zero, do nothing. New dac: " + (lastDAC - 1));
+                        return new TuningResult(lastDAC - 1, TuningResult.Result.NOT_FINISHED);
                     }
                 }
             }
-            return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED);
+            else
+            {
+                return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED); // nemoj nista mijenjati, cekamo da zavrsi sliding frame
+            }
+            
         }
 
         private void writeServiceFile(string str)

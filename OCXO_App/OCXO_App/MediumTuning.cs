@@ -137,6 +137,13 @@ namespace OCXO_App
 
                 if (slidingFrame_2.finished) //measure_blocks_2(lastDAC, lastPhase))  // zavrsio oba bloka
                 {
+                    if (Math.Abs(slidingFrame_2.part_angle) < 3 && slidingFrame_2.phaseAvg_stop < 5 * Math.Pow(10, -9)) // blizu nule i lagano se mijenja
+                    {
+                        writeServiceFile("*********** going to fine tunning. frame2.stop = " + (slidingFrame_2.phaseAvg_stop * Math.Pow(10, 9)) + ", angle: " + slidingFrame_2.part_angle);
+                        state = MediumState.FINISHED;
+                        return new TuningResult(lastDAC, TuningResult.Result.FINISHED);
+                    }
+
                     if (DAC_frame_1 < DAC_frame_2) {  // podigli smo DAC, faza bi trebala da opada u part 2
                         if (slidingFrame_2.part_angle > slidingFrame_1.part_angle) // !!! NIJE KAO OCEKIVANO, faza porasla
                         {
@@ -153,7 +160,7 @@ namespace OCXO_App
                         }
                     }
                     else if (DAC_frame_1 > DAC_frame_2)
-                    {  // smanjil smo DAC, faza bi trebala da raste u part 2
+                    {  // smanjili smo DAC, faza bi trebala da raste u part 2
                         if (slidingFrame_2.part_angle < slidingFrame_1.part_angle) // !!! NIJE KAO OCEKIVANO, faza opala
                         {
                             calculatedDAC = lastDAC + calculateDacStep(slidingFrame_2.phaseAvg_stop);
@@ -170,18 +177,6 @@ namespace OCXO_App
                     }
 
                     calculateNewDac(nTime);
-
-                    // TESTIRAMO MEDIUM. NECEMO ICI U FINE TUNINIG
-                    /*
-                    if (Math.Abs(block_2.part_angle) < 3 && block_2.phaseAvg_stop < 5 * Math.Pow(10, -9)) // blizu nule i lagano se mijenja
-                    {
-                        state = MediumState.FINISHED;
-                        return new TuningResult(calculatedDAC, TuningResult.Result.FINISHED);
-                    }
-                    else
-                    {*/
-                        state = MediumState.TUNING_SLEEP_1;
-                   // }
                 }
 
                 return new TuningResult(calculatedDAC, TuningResult.Result.NOT_FINISHED);
@@ -230,9 +225,9 @@ namespace OCXO_App
 
             if (absPart_1_B_ns < 3)
                 nDacChangeStep = 0;
-            if (absPart_1_B_ns < 6)  
-                nDacChangeStep = 1;   
-            if (absPart_1_B_ns < 8)  
+            else if (absPart_1_B_ns < 6)  
+                nDacChangeStep = 1;
+            else if (absPart_1_B_ns < 8)  
                 nDacChangeStep = 2;
             else if (absPart_1_B_ns < 12)
                 nDacChangeStep = 4;
