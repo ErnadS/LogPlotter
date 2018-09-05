@@ -177,6 +177,7 @@ namespace OCXO_App
                     }
 
                     calculateNewDac(nTime);
+                    state = MediumState.TUNING_SLEEP_1;
                 }
 
                 return new TuningResult(calculatedDAC, TuningResult.Result.NOT_FINISHED);
