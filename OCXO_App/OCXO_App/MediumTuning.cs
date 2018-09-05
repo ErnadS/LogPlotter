@@ -92,7 +92,7 @@ namespace OCXO_App
             {
                 slidingFrame_1.AddPoint(lastPhase);
 
-                if (slidingFrame_1.finished) //   measure_blocks_1(lastDAC, lastPhase))
+                if (slidingFrame_1.finished) //   Finished first block. If phase is crossing zero soon, do not measure block2, just set last calculated optimal dac.
                 {
                     double crossingZeroTime = getZerroCrosingTime();
                     if (crossingZeroTime >= 0 && crossingZeroTime < TUNNING_SLEEP_TIME + FRAME_SIZE)
@@ -102,7 +102,7 @@ namespace OCXO_App
                             calculatedDAC = lastOptimalDac; // Crossing zero soon. Set optimal dac and do not make a measure block 2
                             state = MediumState.TUNING_SLEEP_1; // do not go to tuning state 2 (back to start). 
                             tunningSleepCounter = 0;
-                            writeServiceFile("Time: " + nTime + ". crossingZeroTime = " + crossingZeroTime + ". New DAC = " + lastOptimalDac);
+                            writeServiceFile("Time: " + nTime + ". crossingZeroTime = " + crossingZeroTime + ". Use last Optimal DAC = " + lastOptimalDac);
                             return new TuningResult(lastOptimalDac, TuningResult.Result.NOT_FINISHED);
                         }
                     }

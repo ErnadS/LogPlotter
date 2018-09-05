@@ -241,7 +241,7 @@ namespace OCXO_App
                     TuningResult result = mediumTuning.calculateMediumTuning(dac_value, lastPhase, nTime);
                     if (result.stateResult == TuningResult.Result.FINISHED)
                     {
-                        writeServiceFile("Medium tuning finishe. Time: " + nTime + ". Setting new DAC value before starting fine tuning: " + result.newDAC);
+                        writeServiceFile("Medium tuning finished. Time: " + nTime + ". Setting new DAC value before starting fine tuning: " + result.newDAC);
                         tuningState = TuningState.FINE;
                     }
                     return Convert.ToInt32(result.newDAC);
