@@ -35,19 +35,11 @@ namespace OCXO_App
         const int FRAME_SIZE = 20;   // u jednom frame mjerimo 2 AVG_TIME bez pauze izmedju
         const int AVG_TIME = 10;
 
-   
-
-        enum MediumState
-        {
-            TUNING_SLEEP,  // kada ne diramo DAC 
-            MEASURING_BLOCK_1,
-            FINISHED
-        }
-
 
         public FineTuning()
         {
             phaseAverageExp = new SlidingFrame();
+            phaseAverageExp.init(FRAME_SIZE, AVG_TIME);
             nCounter = 0;
         }
         /*
@@ -84,6 +76,8 @@ namespace OCXO_App
         {
             phaseAverageExp.AddPoint(lastPhase);
             nCounter++;
+
+            // writeServiceFile("C: " + nCounter);
 
             if (nCounter < TUNNING_SLEEP_TIME)
             {
