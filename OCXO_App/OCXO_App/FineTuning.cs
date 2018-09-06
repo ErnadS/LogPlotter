@@ -32,8 +32,8 @@ namespace OCXO_App
         */
 
         const int TUNNING_SLEEP_TIME = 25; // 
-        const int FRAME_SIZE = 20;   // u jednom frame mjerimo 2 AVG_TIME bez pauze izmedju
-        const int AVG_TIME = 10;
+        const int FRAME_SIZE = 40;   // u jednom frame mjerimo 2 AVG_TIME bez pauze izmedju
+        const int AVG_TIME = 20;
 
 
         public FineTuning()
@@ -92,7 +92,7 @@ namespace OCXO_App
 
                 if (Math.Abs(phaseAverageExp.phaseAvg_stop) < 2.8 * Math.Pow(10, -9))
                 {
-                    writeServiceFile("FT: |phase| <2.8, do nothing");
+                    writeServiceFile("Time: " + nTime + ". FT: |phase| <2.8, do nothing. Phase: " + phaseAverageExp.phaseAvg_stop + ", angle: " +  phaseAverageExp.part_angle);
                     return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED); // nemoj nista mijenjati
                 }
                     // PHASE IS POSITIVE
@@ -100,25 +100,25 @@ namespace OCXO_App
                 {
                     if (phaseAverageExp.part_angle < 0) // ide prema nuli
                     {
-                        writeServiceFile("FT: phase positive, going to zero, do nothing. New dac: " + lastDAC);
+                        writeServiceFile("Time: " + nTime + ". FT: phase positive: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ". going to zero, do nothing. New dac: " + lastDAC);
                         return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED);
                     }
                     else
                     {
-                        writeServiceFile("FT: phase positive, not going to zero, do nothing. New dac: " + (lastDAC + 1));
+                        writeServiceFile("Time: " + nTime + ". FT: phase positive: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ".  not going to zero, increase one New dac: " + (lastDAC + 1));
                         return new TuningResult(lastDAC + 1, TuningResult.Result.NOT_FINISHED);
                     }
                 }
-                else
+                else // phase < -2.8ns
                 {
                     if (phaseAverageExp.part_angle > 0) // ide prema nuli
                     {
-                        writeServiceFile("FT: phase negative, going to zero, do nothing. New dac: " + lastDAC);
+                        writeServiceFile("Time: " + nTime + ". FT: phase negative: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ".  going to zero, do nothing. New dac: " + lastDAC);
                         return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED);
                     }
                     else
                     {
-                        writeServiceFile("FT: phase negative, not going to zero, do nothing. New dac: " + (lastDAC - 1));
+                        writeServiceFile("Time: " + nTime + ". FT: phase negative: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ".  not going to zero, decrease one. New dac: " + (lastDAC - 1));
                         return new TuningResult(lastDAC - 1, TuningResult.Result.NOT_FINISHED);
                     }
                 }
