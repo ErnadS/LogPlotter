@@ -31,7 +31,7 @@ namespace OCXO_App
         int nTimeFromPreviousConstDAC;
         */
 
-        const int TUNNING_SLEEP_TIME = 10; // ovdje je krace nego u medium, ocekujemo manje promjene dac-a i brze normalizovanje
+        const int TUNNING_SLEEP_TIME = 25; // 
         const int FRAME_SIZE = 20;   // u jednom frame mjerimo 2 AVG_TIME bez pauze izmedju
         const int AVG_TIME = 10;
 
