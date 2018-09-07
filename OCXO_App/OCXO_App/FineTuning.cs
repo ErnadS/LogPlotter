@@ -100,13 +100,13 @@ namespace OCXO_App
                     {
                         if (phaseAverageExp.part_angle < 0) // ide prema nuli
                         {
-                            writeServiceFile("Time: " + nTime + ". FT*2: phase positive: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ". going to zero, state = GOOING_ZERO_POSITIV. DAC not changed: " + lastDAC);
+                            writeServiceFile("Time: " + nTime + ". FT*2: phase positive: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ". going to zero, new state = GOOING_ZERO_POSITIV. DAC not changed: " + lastDAC);
                             state = FineState.GOOING_ZERO_POSITIV;
                             return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED);
                         }
                         else
                         {
-                            if (phaseAverageExp.phaseAvg_stop < 2.5 * Math.Pow(10, -9))   // faza manja od 2.5, povecaj DAC za 1. // TODO: ne bi trebali gledati fazu nego ugao? Ako je ugao < xx, +1 ili +2?
+                            if (phaseAverageExp.phaseAvg_stop < 3.8 * Math.Pow(10, -9))   // faza manja od 2.5, povecaj DAC za 1. // TODO: ne bi trebali gledati fazu nego ugao? Ako je ugao < xx, +1 ili +2?
                             {
                                 writeServiceFile("Time: " + nTime + ". FT*3: phase positive: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ".  not going to zero, increase one New dac: " + (lastDAC + 1));
                                 return new TuningResult(lastDAC + 1, TuningResult.Result.NOT_FINISHED);
@@ -123,12 +123,13 @@ namespace OCXO_App
                     {
                         if (phaseAverageExp.part_angle > 0) // ide prema nuli
                         {
-                            writeServiceFile("Time: " + nTime + ". FT*5: phase negative: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ".  going to zero, state = GOOING_ZERO_NEGATIVE. DAC not changed: " + lastDAC);
+                            writeServiceFile("Time: " + nTime + ". FT*5: phase negative: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ".  going to zero, new state = GOOING_ZERO_NEGATIVE. DAC not changed: " + lastDAC);
+                            state = FineState.GOOING_ZERO_NEGATIVE;
                             return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED);
                         }
                         else
                         {
-                            if (phaseAverageExp.phaseAvg_stop > -2.5 * Math.Pow(10, -9))
+                            if (phaseAverageExp.phaseAvg_stop > -3.8 * Math.Pow(10, -9))
                             {
                                 writeServiceFile("Time: " + nTime + ". FT*6: phase negative: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ".  not going to zero, decrease one. New dac: " + (lastDAC - 1));
                                 return new TuningResult(lastDAC - 1, TuningResult.Result.NOT_FINISHED);
@@ -157,7 +158,7 @@ namespace OCXO_App
                 {
                     state = FineState.NORMAL; // vrati na normalnu regulaciju
                     nCounter = TUNNING_SLEEP_TIME + FRAME_SIZE - 1;  // Stavi counter tako da sljedeci put izracuna kao da je normalna regulacija
-                    writeServiceFile("Time: " + nTime + ". FT2: phase positive, gooing zero. !!! Now is gooing up " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ". GO TO NORMAL STATE. DAC not changed: " + lastDAC);
+                    writeServiceFile("Time: " + nTime + ". FT2: phase positive, gooing zero. !!! Now is gooing up " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ". New state: NORMAL. DAC not changed: " + lastDAC);
                     return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED); // ??? nemoj mijenjati DAC? jer je mozda privremeni skok?
                 }
                 else
@@ -176,7 +177,7 @@ namespace OCXO_App
                 {
                     state = FineState.NORMAL; // vrati na normalnu regulaciju
                     nCounter = TUNNING_SLEEP_TIME + FRAME_SIZE - 1;  // Stavi counter tako da sljedeci put izracuna kao da je normalna regulacija
-                    writeServiceFile("Time: " + nTime + ". FT4: phase negative, gooing zero. !!! Now is gooing down " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ". GO TO NORMAL STATE. DAC not changed: " + lastDAC);
+                    writeServiceFile("Time: " + nTime + ". FT4: phase negative, gooing zero. !!! Now is gooing down " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ". New state: NORMAL. DAC not changed: " + lastDAC);
                     return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED); // ??? nemoj mijenjati DAC? jer je mozda privremeni skok?
                 }
                 else
@@ -184,13 +185,13 @@ namespace OCXO_App
                     return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED); // do nothing
                 }
             }
-            else if (state == FineState.CLOSE_TO_ZERO)
+            else // if (state == FineState.CLOSE_TO_ZERO)
             {
                 if (Math.Abs(phaseAverageExp.phaseAvg_stop) > 1) // iskocio iz zone blizu nule
                 {
                     state = FineState.NORMAL; // vrati na normalnu regulaciju
                     nCounter = TUNNING_SLEEP_TIME + FRAME_SIZE - 1;  // Stavi counter tako da sljedeci put izracuna kao da je normalna regulacija
-                    writeServiceFile("Time: " + nTime + ". FT5: phase was close to zero, but now out of limit: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ". GO TO NORMAL STATE. DAC not changed: " + lastDAC);
+                    writeServiceFile("Time: " + nTime + ". FT5: phase was close to zero, but now out of limit: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ". New state: NORMAL. DAC not changed: " + lastDAC);
                     return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED); // ??? nemoj mijenjati DAC? jer je mozda privremeni skok?
                 }
                 else
