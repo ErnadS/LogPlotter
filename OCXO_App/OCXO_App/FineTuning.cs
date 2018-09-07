@@ -90,9 +90,10 @@ namespace OCXO_App
                 {
                     nCounter = 0;
 
-                    if (Math.Abs(phaseAverageExp.phaseAvg_stop) < 1 * Math.Pow(10, -9))
+                    if (Math.Abs(phaseAverageExp.phaseAvg_stop) < 1 * Math.Pow(10, -9))  // TODO: ovo nam mozda ne treba? Is normal state je trebao preci u gooing to zero ako se priblizuje nuli. Ovdje ispada da je iznenada skocio blizu nule.
                     {
-                        writeServiceFile("Time: " + nTime + ". FT*1: |phase| <1, state = CLOSE_TO_ZERO. Phase: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ". DAC not changed");
+                        state = FineState.CLOSE_TO_ZERO;
+                        writeServiceFile("Time: " + nTime + ". FT*1: Unexpected |phase| <1. Phase: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ", new state = CLOSE_TO_ZERO. DAC not changed");
                         return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED); // nemoj nista mijenjati
                     }
                     // PHASE IS POSITIVE
@@ -151,7 +152,8 @@ namespace OCXO_App
             {
                 if (phaseAverageExp.phaseAvg_stop < 1 * Math.Pow(10, -9))  // usli blizu nule, zaustavi opadanje
                 {
-                    writeServiceFile("Time: " + nTime + ". FT1: phase positive, gooing zero. Now close " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ". New dac -1: " + lastDAC);
+                    state = FineState.CLOSE_TO_ZERO;
+                    writeServiceFile("Time: " + nTime + ". FT1: phase positive, gooing zero. Phase: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ". New state: CLOSE_TO_ZERO, New dac -1: " + lastDAC);
                     return new TuningResult(lastDAC-1, TuningResult.Result.NOT_FINISHED);
                 }
                 else if (phaseAverageExp.part_angle > 0) // ne ide vise prema nuli
@@ -170,7 +172,8 @@ namespace OCXO_App
             {
                 if (phaseAverageExp.phaseAvg_stop > -1 * Math.Pow(10, -9))  // usli blizu nule, zaustavi rast
                 {
-                    writeServiceFile("Time: " + nTime + ". FT3: phase negative, gooing zero. Now close " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ". New dac +1: " + lastDAC);
+                    state = FineState.CLOSE_TO_ZERO;
+                    writeServiceFile("Time: " + nTime + ". FT3: phase negative, gooing zero. Phase: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ". New state: CLOSE_TO_ZERO, New dac +1: " + lastDAC);
                     return new TuningResult(lastDAC + 1, TuningResult.Result.NOT_FINISHED);
                 }
                 else if (phaseAverageExp.part_angle < 0) // ne ide vise prema nuli
