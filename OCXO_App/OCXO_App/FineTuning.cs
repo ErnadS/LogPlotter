@@ -86,7 +86,7 @@ namespace OCXO_App
 
             if (state == FineState.NORMAL)  // u normalnom state, cekaj da napuni frame size i onda reaguj
             {
-                if (nCounter == TUNNING_SLEEP_TIME + FRAME_SIZE)
+                if (nCounter >= TUNNING_SLEEP_TIME + FRAME_SIZE)
                 {
                     nCounter = 0;
 
