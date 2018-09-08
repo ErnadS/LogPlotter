@@ -86,7 +86,7 @@ namespace OCXO_App
 
             if (state == FineState.NORMAL)  // u normalnom state, cekaj da napuni frame size i onda reaguj
             {
-                if (nCounter >= TUNNING_SLEEP_TIME + FRAME_SIZE)
+                if (nCounter == TUNNING_SLEEP_TIME + FRAME_SIZE)
                 {
                     nCounter = 0;
 
@@ -190,7 +190,7 @@ namespace OCXO_App
             }
             else // if (state == FineState.CLOSE_TO_ZERO)
             {
-                if (Math.Abs(phaseAverageExp.phaseAvg_stop) > 1) // iskocio iz zone blizu nule
+                if (Math.Abs(phaseAverageExp.phaseAvg_stop) > 1 * Math.Pow(10, -9)) // iskocio iz zone blizu nule
                 {
                     state = FineState.NORMAL; // vrati na normalnu regulaciju
                     nCounter = TUNNING_SLEEP_TIME + FRAME_SIZE - 1;  // Stavi counter tako da sljedeci put izracuna kao da je normalna regulacija
