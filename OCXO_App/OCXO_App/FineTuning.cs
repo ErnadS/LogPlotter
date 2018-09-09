@@ -192,10 +192,18 @@ namespace OCXO_App
             {
                 if (Math.Abs(phaseAverageExp.phaseAvg_stop) > 1 * Math.Pow(10, -9)) // iskocio iz zone blizu nule
                 {
+                    
                     state = FineState.NORMAL; // vrati na normalnu regulaciju
                     nCounter = TUNNING_SLEEP_TIME + FRAME_SIZE - 1;  // Stavi counter tako da sljedeci put izracuna kao da je normalna regulacija
                     writeServiceFile("Time: " + nTime + ". FT5: phase was close to zero, but now out of limit: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ". New state: NORMAL. DAC not changed: " + lastDAC);
-                    return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED); // ??? nemoj mijenjati DAC? jer je mozda privremeni skok?
+                    if (phaseAverageExp.phaseAvg_stop > 1 * Math.Pow(10, -9))  // ide u plus
+                    {
+                        return new TuningResult(lastDAC + 1, TuningResult.Result.NOT_FINISHED);
+                    }
+                    else
+                    {
+                        return new TuningResult(lastDAC - 1, TuningResult.Result.NOT_FINISHED);
+                    }
                 }
                 else
                     return new TuningResult(lastDAC, TuningResult.Result.NOT_FINISHED); // do nothing
