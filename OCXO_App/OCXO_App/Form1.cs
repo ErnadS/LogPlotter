@@ -25,7 +25,7 @@ namespace OCXO_App
         Thread t;
         Stopwatch stopwatch = new Stopwatch();
         bool closedLoopFlag = false;
-        const double DEFAULT_DAC_VALUE = 0;//131072;
+        const double DEFAULT_DAC_VALUE = 131072;//131072;
         double dac_value = DEFAULT_DAC_VALUE;
         double oldValue = DEFAULT_DAC_VALUE;
         List<double> oldValues = new List<double>(0);
@@ -46,7 +46,8 @@ namespace OCXO_App
         }
 
         // Nemoj imati vise varijabli za jedno stanje (povecava sansu da imas gresku). Bolje je jedna varijabla sa vise stanja.
-        TuningState tuningState = TuningState.CROASE;
+        //TuningState tuningState = TuningState.CROASE;
+        TuningState tuningState = TuningState.MEDIUM;
 
         MediumTuning mediumTuning = new MediumTuning();
         FineTuning fineTuning = new FineTuning();

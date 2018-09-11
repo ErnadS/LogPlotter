@@ -137,7 +137,7 @@ namespace OCXO_App
 
                 if (slidingFrame_2.finished) //measure_blocks_2(lastDAC, lastPhase))  // zavrsio oba bloka
                 {
-                    if (Math.Abs(slidingFrame_2.part_angle) < 3 && slidingFrame_2.phaseAvg_stop < 5 * Math.Pow(10, -9)) // blizu nule i lagano se mijenja
+                    if (Math.Abs(slidingFrame_2.part_angle) < 2 && Math.Abs(slidingFrame_2.phaseAvg_stop) < 4 * Math.Pow(10, -9)) // blizu nule i lagano se mijenja
                     {
                         writeServiceFile("*********** going to fine tunning. frame2.stop = " + (slidingFrame_2.phaseAvg_stop * Math.Pow(10, 9)) + ", angle: " + slidingFrame_2.part_angle);
                         state = MediumState.FINISHED;
