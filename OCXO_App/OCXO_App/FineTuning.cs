@@ -114,7 +114,7 @@ namespace OCXO_App
                             }
                             else
                             {   // faza je veca od 2.5, povecaj za 2
-                                writeServiceFile("Time: " + nTime + ". FT*4: phase positive: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ".  not going to zero, increase two New dac: " + (lastDAC + 1));
+                                writeServiceFile("Time: " + nTime + ". FT*4: phase positive: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ".  not going to zero, increase two New dac: " + (lastDAC + 2));
                                 return new TuningResult(lastDAC + 2, TuningResult.Result.NOT_FINISHED);
                             }
 
@@ -137,7 +137,7 @@ namespace OCXO_App
                             }
                             else
                             {
-                                writeServiceFile("Time: " + nTime + ". FT*7: phase negative: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ".  not going to zero, decrease two. New dac: " + (lastDAC - 1));
+                                writeServiceFile("Time: " + nTime + ". FT*7: phase negative: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ".  not going to zero, decrease two. New dac: " + (lastDAC - 2));
                                 return new TuningResult(lastDAC - 2, TuningResult.Result.NOT_FINISHED);
                             }
                         }
