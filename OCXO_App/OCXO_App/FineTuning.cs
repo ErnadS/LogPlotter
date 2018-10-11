@@ -115,13 +115,9 @@ namespace OCXO_App
                             }
                             else
                             {   // faza je veca od 2.5, povecaj za 2
-<<<<<<< HEAD
-                                writeServiceFile("Time: " + nTime + ". FT*4: phase positive: " + phaseAverageExp.phaseAvg_start + "; " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ".  not going to zero, increase two New dac: " + (lastDAC + 1));
-                                return new TuningResult(lastDAC + 2*ccoef, TuningResult.Result.NOT_FINISHED);
-=======
                                 writeServiceFile("Time: " + nTime + ". FT*4: phase positive: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ".  not going to zero, increase two New dac: " + (lastDAC + 2));
                                 return new TuningResult(lastDAC + 2, TuningResult.Result.NOT_FINISHED);
->>>>>>> 3b397054e13e62384d20094ceafb0d10856a1cbd
+
                             }
 
                         }
@@ -143,13 +139,9 @@ namespace OCXO_App
                             }
                             else
                             {
-<<<<<<< HEAD
-                                writeServiceFile("Time: " + nTime + ". FT*7: phase negative: " + phaseAverageExp.phaseAvg_start + "; " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ".  not going to zero, decrease two. New dac: " + (lastDAC - 1));
-                                return new TuningResult(lastDAC - 2*ccoef, TuningResult.Result.NOT_FINISHED);
-=======
                                 writeServiceFile("Time: " + nTime + ". FT*7: phase negative: " + phaseAverageExp.phaseAvg_stop + ", angle: " + phaseAverageExp.part_angle + ".  not going to zero, decrease two. New dac: " + (lastDAC - 2));
                                 return new TuningResult(lastDAC - 2, TuningResult.Result.NOT_FINISHED);
->>>>>>> 3b397054e13e62384d20094ceafb0d10856a1cbd
+
                             }
                         }
                     }
