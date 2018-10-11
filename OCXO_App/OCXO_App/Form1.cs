@@ -46,8 +46,8 @@ namespace OCXO_App
         }
 
         // Nemoj imati vise varijabli za jedno stanje (povecava sansu da imas gresku). Bolje je jedna varijabla sa vise stanja.
-        //TuningState tuningState = TuningState.CROASE;
-        TuningState tuningState = TuningState.MEDIUM;
+        TuningState tuningState = TuningState.CROASE;
+        //TuningState tuningState = TuningState.MEDIUM;
 
         MediumTuning mediumTuning = new MediumTuning();
         FineTuning fineTuning = new FineTuning();
@@ -114,9 +114,9 @@ namespace OCXO_App
         {
             try
             {
-                serialPhasePort = new SerialPort(phaseComPort.Text, 57600);
+                //serialPhasePort = new SerialPort(phaseComPort.Text, 57600);
                 serialOCXOPort = new SerialPort(dacComPort.Text, 57600);
-                serialPhasePort.Open();
+                //serialPhasePort.Open();
                 serialOCXOPort.Open();
                 t = new Thread(handleInputFromFPGA);
                 t.Start();
@@ -188,11 +188,11 @@ namespace OCXO_App
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private void handleInputFromFPGA()  // promjenio sam ime "updatePhaseValue" jer mi zvuci kao da ova funkcija samo osvjezava vrjednost faze (a ovo je glavna funkcija). Ti ces sigurno naci bolje ime ("mainHandler"???)
         {
-            while (serialPhasePort.IsOpen)
+            while (serialOCXOPort.IsOpen)
             {
                 try
                 {
-                    inputData = serialPhasePort.ReadLine();
+                    inputData = serialOCXOPort.ReadLine();
                     // TODO: !!! ovdje bi trebalo provjeriti da li je primljena linja ispravne duzine i ispisati gresku ako nastane
                     double lastPhase = Phase.calculatePhaseFromInputString(inputData);
 
@@ -279,19 +279,19 @@ namespace OCXO_App
         {
             if (Math.Abs(phase) < 50  *Math.Pow(10, -9)) //Uslov za fino podesenje da je faza 100 sekundi manja od 5*2.5ns
             {
-                /*
+                
                 counter++;
-                if (counter == 200)
-                {*/
+                if (counter == 50)
+                {
                     tuningState = TuningState.MEDIUM;
 
                     label9.Text = "Medium Tuning ON";
-                //}
+                }
             }
-            /* else
+             else
             {
                 counter = 0;
-            }*/
+            }
         }
 
         private double coarseTuneDAC(double phase, int nTime)
@@ -403,7 +403,7 @@ namespace OCXO_App
         */
         private void disconnect_Click(object sender, EventArgs e)
         {
-            serialPhasePort.Close();
+            //serialPhasePort.Close();
             serialOCXOPort.Close();
             stopwatch.Stop();
         }
