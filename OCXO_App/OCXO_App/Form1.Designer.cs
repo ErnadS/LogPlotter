@@ -108,7 +108,8 @@
             this.dacComPort.Name = "dacComPort";
             this.dacComPort.Size = new System.Drawing.Size(100, 20);
             this.dacComPort.TabIndex = 5;
-            this.dacComPort.Text = "COM3";
+            this.dacComPort.Text = "COM19";
+            this.dacComPort.TextChanged += new System.EventHandler(this.dacComPort_TextChanged);
             // 
             // connect
             // 

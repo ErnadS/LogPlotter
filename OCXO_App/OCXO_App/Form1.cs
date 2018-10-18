@@ -31,7 +31,7 @@ namespace OCXO_App
         List<double> oldValues = new List<double>(0);
         List<Int32> phaseArr = new List<Int32>();
         double DAC_movingAverageSum = 0;// DEFAULT_DAC_VALUE; // NEW!!! Startamo sa 131072
-        Int32 counter = 0;
+        Int32 counter = 0, counter1 = 0;
 
         string inputData;
 
@@ -48,6 +48,7 @@ namespace OCXO_App
         // Nemoj imati vise varijabli za jedno stanje (povecava sansu da imas gresku). Bolje je jedna varijabla sa vise stanja.
         TuningState tuningState = TuningState.CROASE;
         //TuningState tuningState = TuningState.MEDIUM;
+        Regulator regulator = new Regulator();
 
         MediumTuning mediumTuning = new MediumTuning();
         FineTuning fineTuning = new FineTuning();
@@ -197,6 +198,7 @@ namespace OCXO_App
                     double lastPhase = Phase.calculatePhaseFromInputString(inputData);
 
                     addPhaseToGraph(lastPhase);
+                    writePhaseToFile(lastPhase);
 
                     if (closedLoopFlag) //closed loop operation
                     {
@@ -210,7 +212,6 @@ namespace OCXO_App
 
                         addDacToGraph(dac_value);
                         writeDacToFile(dac_value);
-                        writePhaseToFile(lastPhase);
                     }
 
                     nTime++;
@@ -232,6 +233,7 @@ namespace OCXO_App
                 if (tuningState == TuningState.CROASE) // Grubo podesavanje
                 {
                     double tmp = coarseTuneDAC(phase, nTime);
+                    regulator.dACOffset = tmp;
 
                     checkTuningState(lastPhase);  // change state to MEDIUM if phase low in last 100 measurements
 
@@ -239,13 +241,20 @@ namespace OCXO_App
                 }
                 else if (tuningState == TuningState.MEDIUM) // Srednje podesavanje
                 {
-                    TuningResult result = mediumTuning.calculateMediumTuning(dac_value, lastPhase, nTime);
+                    /*TuningResult result = mediumTuning.calculateMediumTuning(dac_value, lastPhase, nTime);
                     if (result.stateResult == TuningResult.Result.FINISHED)
                     {
                         writeServiceFile("Medium tuning finished. Time: " + nTime + ". Setting new DAC value before starting fine tuning: " + result.newDAC);
                         tuningState = TuningState.FINE;
                     }
-                    return Convert.ToInt32(result.newDAC);
+                    return Convert.ToInt32(result.newDAC);*/
+                    counter1++;
+                    Int32 dacReg =  Convert.ToInt32(regulator.nextValue(dac_value, lastPhase, nTime));
+                    if(counter1 == 5)
+                    {
+                        counter1 = 0;
+                        return dacReg;
+                    }
                     // OVO VRATI AKO HOCES DA PROBAS STARU FUNKCIJU
                     // Faza se dodaje u listu i svako deset sekundo se poziva funkcija calculateMediumtuning
                     /*phaseArr.Add(Convert.ToInt32(phaseExpAvg.calculateExpAvg(phase))); //calculateAvg(phase)));
@@ -281,7 +290,7 @@ namespace OCXO_App
             {
                 
                 counter++;
-                if (counter == 50)
+                if (counter == 150)
                 {
                     tuningState = TuningState.MEDIUM;
 
@@ -540,6 +549,11 @@ namespace OCXO_App
         {
             serialOCXOPort.Close();
             stopwatch.Stop();
+        }
+
+        private void dacComPort_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
