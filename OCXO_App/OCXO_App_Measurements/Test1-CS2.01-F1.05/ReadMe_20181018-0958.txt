@@ -1,0 +1,7 @@
+Test No. 1
+
+hadzemAlg - CS 2.01
+Hardware H2
+FPGA F1.05 - Corrected accumulator with Hadzem's schematic (see image in folder)
+
+Conditions: OCXO Unit was warm (aprox. 1 hour in Turn ON state before testing).

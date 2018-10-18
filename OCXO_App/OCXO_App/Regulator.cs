@@ -17,7 +17,8 @@ namespace OCXO_App
         static Int16 counter = 0;
         static double dacacc = 0;
         double iSignal = 0, satSignal = 0;
-        double dac_corr = 0;
+        double dac_corr = 0, e_t_acc = 0;
+        double Ti = 0.0001;
 
         Int16 N = 60;
         public Regulator() { }
@@ -66,6 +67,7 @@ namespace OCXO_App
 
             //Calculate error from first adder
             e_t = refPhase - newPhase;
+            //e_t_acc = e_t_acc + Ti * e_t;
 
             //Calculate error from second adder
             deltaPhase = newPhase - phase;
