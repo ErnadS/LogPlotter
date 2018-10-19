@@ -194,6 +194,7 @@ namespace OCXO_App
                 try
                 {
                     inputData = serialOCXOPort.ReadLine();
+                    writeRAWData(inputData);
                     // TODO: !!! ovdje bi trebalo provjeriti da li je primljena linja ispravne duzine i ispisati gresku ako nastane
                     double lastPhase = Phase.calculatePhaseFromInputString(inputData);
 
@@ -503,6 +504,16 @@ namespace OCXO_App
                 dv.Close();
             }
         }
+
+        private void writeRAWData(string inputData)
+        {
+            using (StreamWriter dv = new StreamWriter("raw_data.txt", true))
+            {
+                dv.WriteLine(inputData);
+                dv.Close();
+            }
+        }
+
 
         private void tempStartLog_Click(object sender, EventArgs e)
         {
