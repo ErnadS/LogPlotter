@@ -56,6 +56,7 @@ namespace OCXO_App
         DateTime dateTime = DateTime.Now;
         string phaseFile = "";
         string dacFile = "";
+        Int32 tempReg = 0;
 
 
         public Form1()
@@ -251,10 +252,13 @@ namespace OCXO_App
                     return Convert.ToInt32(result.newDAC);*/
                     counter1++;
                     Int32 dacReg =  Convert.ToInt32(regulator.nextValue(dac_value, lastPhase, nTime));
+                    tempReg += dacReg;
                     if(counter1 == 5)
                     {
                         counter1 = 0;
-                        return dacReg;
+                        Int32 returnVal = tempReg / 5;
+                        tempReg = 0; 
+                        return returnVal;
                     }
                     // OVO VRATI AKO HOCES DA PROBAS STARU FUNKCIJU
                     // Faza se dodaje u listu i svako deset sekundo se poziva funkcija calculateMediumtuning
