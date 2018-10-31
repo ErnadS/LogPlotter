@@ -492,12 +492,14 @@ namespace OCXO_App
 
         private void startClosedLoop_Click(object sender, EventArgs e)
         {
-            closedLoopFlag = true;
+            //closedLoopFlag = true;
+            serialOCXOPort.Write("!D1\r\n");
         }
 
         private void stopClosedLoop_Click(object sender, EventArgs e)
         {
-            closedLoopFlag = false;
+            //closedLoopFlag = false;
+            serialOCXOPort.Write("!D0\r\n");
         }
 
         private void writeDACToFile(string dac_value, double seconds)
@@ -564,6 +566,11 @@ namespace OCXO_App
         {
             serialOCXOPort.Close();
             stopwatch.Stop();
+        }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+
         }
 
         private void dacComPort_TextChanged(object sender, EventArgs e)

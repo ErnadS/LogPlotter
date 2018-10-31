@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.cartesianChart1 = new LiveCharts.WinForms.CartesianChart();
-            this.cartesianChart2 = new LiveCharts.WinForms.CartesianChart();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.phaseComPort = new System.Windows.Forms.TextBox();
@@ -57,23 +56,16 @@
             this.label10 = new System.Windows.Forms.Label();
             this.tempStartLog = new System.Windows.Forms.Button();
             this.tempStopLog = new System.Windows.Forms.Button();
+            this.cartesianChart2 = new LiveCharts.WinForms.CartesianChart();
             this.SuspendLayout();
             // 
             // cartesianChart1
             // 
             this.cartesianChart1.Location = new System.Drawing.Point(381, 12);
             this.cartesianChart1.Name = "cartesianChart1";
-            this.cartesianChart1.Size = new System.Drawing.Size(1459, 490);
+            this.cartesianChart1.Size = new System.Drawing.Size(1065, 803);
             this.cartesianChart1.TabIndex = 0;
             this.cartesianChart1.Text = "cartesianChart1";
-            // 
-            // cartesianChart2
-            // 
-            this.cartesianChart2.Location = new System.Drawing.Point(381, 511);
-            this.cartesianChart2.Name = "cartesianChart2";
-            this.cartesianChart2.Size = new System.Drawing.Size(1459, 392);
-            this.cartesianChart2.TabIndex = 1;
-            this.cartesianChart2.Text = "cartesianChart2";
             // 
             // label1
             // 
@@ -83,16 +75,17 @@
             this.label1.Size = new System.Drawing.Size(155, 13);
             this.label1.TabIndex = 2;
             this.label1.Text = "Phase measurement COM Port:";
+            this.label1.Visible = false;
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(56, 61);
+            this.label2.Location = new System.Drawing.Point(111, 63);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(111, 13);
+            this.label2.Size = new System.Drawing.Size(56, 13);
             this.label2.TabIndex = 3;
-            this.label2.Text = "DAC Value COM Port:";
+            this.label2.Text = "COM Port:";
             // 
             // phaseComPort
             // 
@@ -101,6 +94,7 @@
             this.phaseComPort.Size = new System.Drawing.Size(100, 20);
             this.phaseComPort.TabIndex = 4;
             this.phaseComPort.Text = "COM8";
+            this.phaseComPort.Visible = false;
             // 
             // dacComPort
             // 
@@ -133,7 +127,7 @@
             // 
             // currentDacValue
             // 
-            this.currentDacValue.Location = new System.Drawing.Point(148, 455);
+            this.currentDacValue.Location = new System.Drawing.Point(148, 633);
             this.currentDacValue.Name = "currentDacValue";
             this.currentDacValue.ReadOnly = true;
             this.currentDacValue.Size = new System.Drawing.Size(100, 20);
@@ -141,7 +135,7 @@
             // 
             // sendedDacValue
             // 
-            this.sendedDacValue.Location = new System.Drawing.Point(148, 481);
+            this.sendedDacValue.Location = new System.Drawing.Point(148, 659);
             this.sendedDacValue.Name = "sendedDacValue";
             this.sendedDacValue.Size = new System.Drawing.Size(100, 20);
             this.sendedDacValue.TabIndex = 9;
@@ -149,7 +143,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(43, 458);
+            this.label3.Location = new System.Drawing.Point(43, 636);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(99, 13);
             this.label3.TabIndex = 10;
@@ -158,7 +152,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(14, 484);
+            this.label4.Location = new System.Drawing.Point(14, 662);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(128, 13);
             this.label4.TabIndex = 11;
@@ -166,7 +160,7 @@
             // 
             // send
             // 
-            this.send.Location = new System.Drawing.Point(254, 479);
+            this.send.Location = new System.Drawing.Point(254, 657);
             this.send.Name = "send";
             this.send.Size = new System.Drawing.Size(75, 23);
             this.send.TabIndex = 12;
@@ -176,7 +170,7 @@
             // 
             // startClosedLoop
             // 
-            this.startClosedLoop.Location = new System.Drawing.Point(90, 304);
+            this.startClosedLoop.Location = new System.Drawing.Point(90, 222);
             this.startClosedLoop.Name = "startClosedLoop";
             this.startClosedLoop.Size = new System.Drawing.Size(75, 23);
             this.startClosedLoop.TabIndex = 13;
@@ -186,7 +180,7 @@
             // 
             // stopClosedLoop
             // 
-            this.stopClosedLoop.Location = new System.Drawing.Point(171, 304);
+            this.stopClosedLoop.Location = new System.Drawing.Point(171, 222);
             this.stopClosedLoop.Name = "stopClosedLoop";
             this.stopClosedLoop.Size = new System.Drawing.Size(75, 23);
             this.stopClosedLoop.TabIndex = 14;
@@ -197,65 +191,71 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(111, 288);
+            this.label5.Location = new System.Drawing.Point(136, 206);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(118, 13);
+            this.label5.Size = new System.Drawing.Size(60, 13);
             this.label5.TabIndex = 15;
-            this.label5.Text = "Closed Loop Operation:";
+            this.label5.Text = "Disciplining";
+            this.label5.Click += new System.EventHandler(this.label5_Click);
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(111, 340);
+            this.label6.Location = new System.Drawing.Point(111, 518);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(121, 13);
             this.label6.TabIndex = 16;
             this.label6.Text = "Predefined DAC Values:";
+            this.label6.Visible = false;
             // 
             // dac0
             // 
-            this.dac0.Location = new System.Drawing.Point(90, 356);
+            this.dac0.Location = new System.Drawing.Point(90, 534);
             this.dac0.Name = "dac0";
             this.dac0.Size = new System.Drawing.Size(75, 23);
             this.dac0.TabIndex = 17;
             this.dac0.Text = "0";
             this.dac0.UseVisualStyleBackColor = true;
+            this.dac0.Visible = false;
             this.dac0.Click += new System.EventHandler(this.dac0_Click);
             // 
             // dac131072
             // 
-            this.dac131072.Location = new System.Drawing.Point(171, 356);
+            this.dac131072.Location = new System.Drawing.Point(171, 534);
             this.dac131072.Name = "dac131072";
             this.dac131072.Size = new System.Drawing.Size(75, 23);
             this.dac131072.TabIndex = 18;
             this.dac131072.Text = "131072";
             this.dac131072.UseVisualStyleBackColor = true;
+            this.dac131072.Visible = false;
             this.dac131072.Click += new System.EventHandler(this.dac131072_Click);
             // 
             // dac150000
             // 
-            this.dac150000.Location = new System.Drawing.Point(90, 385);
+            this.dac150000.Location = new System.Drawing.Point(90, 563);
             this.dac150000.Name = "dac150000";
             this.dac150000.Size = new System.Drawing.Size(75, 23);
             this.dac150000.TabIndex = 19;
             this.dac150000.Text = "150000";
             this.dac150000.UseVisualStyleBackColor = true;
+            this.dac150000.Visible = false;
             this.dac150000.Click += new System.EventHandler(this.dac150000_Click);
             // 
             // dac262143
             // 
-            this.dac262143.Location = new System.Drawing.Point(171, 385);
+            this.dac262143.Location = new System.Drawing.Point(171, 563);
             this.dac262143.Name = "dac262143";
             this.dac262143.Size = new System.Drawing.Size(75, 23);
             this.dac262143.TabIndex = 20;
             this.dac262143.Text = "262143";
             this.dac262143.UseVisualStyleBackColor = true;
+            this.dac262143.Visible = false;
             this.dac262143.Click += new System.EventHandler(this.dac262143_Click);
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(136, 182);
+            this.label7.Location = new System.Drawing.Point(136, 144);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(68, 13);
             this.label7.TabIndex = 21;
@@ -263,7 +263,7 @@
             // 
             // sync
             // 
-            this.sync.Location = new System.Drawing.Point(132, 198);
+            this.sync.Location = new System.Drawing.Point(132, 160);
             this.sync.Name = "sync";
             this.sync.Size = new System.Drawing.Size(75, 23);
             this.sync.TabIndex = 22;
@@ -274,7 +274,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(35, 511);
+            this.label8.Location = new System.Drawing.Point(35, 689);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(107, 13);
             this.label8.TabIndex = 23;
@@ -282,7 +282,7 @@
             // 
             // currentPhaseValue
             // 
-            this.currentPhaseValue.Location = new System.Drawing.Point(148, 507);
+            this.currentPhaseValue.Location = new System.Drawing.Point(148, 685);
             this.currentPhaseValue.Name = "currentPhaseValue";
             this.currentPhaseValue.ReadOnly = true;
             this.currentPhaseValue.Size = new System.Drawing.Size(100, 20);
@@ -291,16 +291,17 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(145, 554);
+            this.label9.Location = new System.Drawing.Point(145, 732);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(99, 13);
             this.label9.TabIndex = 25;
             this.label9.Text = "Medium tuning OFF";
+            this.label9.Visible = false;
             // 
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(111, 671);
+            this.label10.Location = new System.Drawing.Point(111, 776);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(105, 13);
             this.label10.TabIndex = 26;
@@ -308,7 +309,7 @@
             // 
             // tempStartLog
             // 
-            this.tempStartLog.Location = new System.Drawing.Point(86, 687);
+            this.tempStartLog.Location = new System.Drawing.Point(86, 792);
             this.tempStartLog.Name = "tempStartLog";
             this.tempStartLog.Size = new System.Drawing.Size(75, 23);
             this.tempStartLog.TabIndex = 27;
@@ -318,7 +319,7 @@
             // 
             // tempStopLog
             // 
-            this.tempStopLog.Location = new System.Drawing.Point(170, 687);
+            this.tempStopLog.Location = new System.Drawing.Point(170, 792);
             this.tempStopLog.Name = "tempStopLog";
             this.tempStopLog.Size = new System.Drawing.Size(75, 23);
             this.tempStopLog.TabIndex = 28;
@@ -326,11 +327,20 @@
             this.tempStopLog.UseVisualStyleBackColor = true;
             this.tempStopLog.Click += new System.EventHandler(this.tempStopLog_Click);
             // 
+            // cartesianChart2
+            // 
+            this.cartesianChart2.Location = new System.Drawing.Point(381, 511);
+            this.cartesianChart2.Name = "cartesianChart2";
+            this.cartesianChart2.Size = new System.Drawing.Size(1459, 392);
+            this.cartesianChart2.TabIndex = 1;
+            this.cartesianChart2.Text = "cartesianChart2";
+            this.cartesianChart2.Visible = false;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1852, 915);
+            this.ClientSize = new System.Drawing.Size(1458, 827);
             this.Controls.Add(this.tempStopLog);
             this.Controls.Add(this.tempStartLog);
             this.Controls.Add(this.label10);
@@ -370,7 +380,6 @@
         #endregion
 
         private LiveCharts.WinForms.CartesianChart cartesianChart1;
-        private LiveCharts.WinForms.CartesianChart cartesianChart2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox phaseComPort;
@@ -398,6 +407,7 @@
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Button tempStartLog;
         private System.Windows.Forms.Button tempStopLog;
+        private LiveCharts.WinForms.CartesianChart cartesianChart2;
     }
 }
 

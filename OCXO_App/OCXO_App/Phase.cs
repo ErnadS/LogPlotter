@@ -36,7 +36,7 @@ namespace OCXO_App
                 {
                     if (inputValues[1] == 0)  // inputValues[1] == 0 znaci faza manja od 100us (ili 50?). Onda ima smisla da koristimo i fino mjerenje u racunici
                     {
-                        phase = ((Convert.ToDouble(inputValues[2]) / (400000000)) + inputValues[4] * (15 * Math.Pow(10, (-11))) - inputValues[3] * (15 * Math.Pow(10, -11))) * (-1);//ovdje promijeniti i 4 i 3                 
+                        phase = ((Convert.ToDouble(inputValues[2]) / (409600000)) + inputValues[4] * (15 * Math.Pow(10, (-11))) - inputValues[3] * (15 * Math.Pow(10, -11))) * (-1);//ovdje promijeniti i 4 i 3                 
                     }
                     else // faza je veca od 100us, nema potrebe koristiti fino mjerenje i koristen je clock od 200MHz
                     {
@@ -47,7 +47,7 @@ namespace OCXO_App
                 {
                     if (inputValues[1] == 0)
                     {
-                        phase = ((Convert.ToDouble(inputValues[2]) / (400000000)) + inputValues[4] * (15 * Math.Pow(10, (-11))) - inputValues[3] * (15 * Math.Pow(10, -11)));
+                        phase = ((Convert.ToDouble(inputValues[2]) / (409600000)) + inputValues[4] * (15 * Math.Pow(10, (-11))) - inputValues[3] * (15 * Math.Pow(10, -11)));
                     }
                     else
                     {

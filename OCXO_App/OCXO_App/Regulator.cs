@@ -79,7 +79,7 @@ namespace OCXO_App
             pSignal = p_t * p;
 
             //I line
-            if (Math.Abs(satSignal) > 0.000000001)
+            if (Math.Abs(satSignal) < 0.000000001)
                 iSignal_temp = p_t * i;
             else
             {
