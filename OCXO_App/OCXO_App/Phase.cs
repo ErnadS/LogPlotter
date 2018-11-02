@@ -7,8 +7,7 @@ namespace OCXO_App
 {
     public class Phase
     {
-        // !!!HELP: ovo je vrijednost faze u sekundama ili u sec/10? Ona se prikazuje na grafu.
-        public static double calculatePhaseFromInputString(string input)   // staticka funkcija jer ne postavlja nikakve member varijable. Samo primi nesto i vrati rezultat. Obzirom da je staticka, ne treba nam objekat
+        public static double calculatePhaseFromInputString(string input)   //calculating phase Value from received string from OCXO Unit or OCXO Test Board
         {
             string[] subInputs = input.Split(',');
             List<Int32> inputValues = new List<Int32>();
@@ -19,26 +18,19 @@ namespace OCXO_App
             }
             if (inputValues.Count == 5)
             {
-                // inputValues[2] ima 32-bitni brojac u FPGA koji broji impulse od 400MHz (ili 200). =>
-                // inputValues[2] / 400000000 je vrijeme u sekundama izmedju eksternog i generisanog PPS-a. To je grubo mjerenje.
+                // inputValues[2] - 32-bit counter, used for coarse measurement
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Za fino mjerenje trebamo jos dodati vrijeme od prvog PPS-a koji je dosao, do prvog 400MHz impulsa:
+                // Fine measurement
                 // inputValues[3] * (20 * Math.Pow(10, (-11)))
-                // inputValues[3] je broj celija a 20*10^-11 je vrijeme prebacivanja iz celije u celiju
+                // inputValues[3] number of logical cells which has log. 1 at output
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Na to jos trebamo dodati vrijeme od zadnjeg izmjerenog clock pa do drugog PPS-a koji je dosao. To vrijeme nemamo
-                // ali imamo vrijeme od drugog PPS-a pa do sljedeceg clock 400MHz. Taj impuls nije unutar mjerenja i nama treba vrijeme do prethodnog 400MHz.
-                // Zato od perioda 400MHz oduzimamo izmjereno vrijeme:
-                // 2.5 * Math.Pow(10, -9) - inputValues[4] * (20 * Math.Pow(10, -11))
-                // Period je 2.5 * Math.Pow(10, -9)
-                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                if (inputValues[0] == 0)   // inputValues[0] = 0, znaci da je prvo dosao externi PPS
+                if (inputValues[0] == 0)   // inputValues[0] = 0, external PPS comes first
                 {
-                    if (inputValues[1] == 0)  // inputValues[1] == 0 znaci faza manja od 100us (ili 50?). Onda ima smisla da koristimo i fino mjerenje u racunici
+                    if (inputValues[1] == 0)  // inputValues[1] == 0, phase is small use coarse and fine measurement, phase sampling frequency 400MHz (on OCXO unit is 409.6MHz)
                     {
-                        phase = ((Convert.ToDouble(inputValues[2]) / (409600000)) + inputValues[4] * (15 * Math.Pow(10, (-11))) - inputValues[3] * (15 * Math.Pow(10, -11))) * (-1);//ovdje promijeniti i 4 i 3                 
+                        phase = ((Convert.ToDouble(inputValues[2]) / (409600000)) + inputValues[4] * (15 * Math.Pow(10, (-11))) - inputValues[3] * (15 * Math.Pow(10, -11))) * (-1);             
                     }
-                    else // faza je veca od 100us, nema potrebe koristiti fino mjerenje i koristen je clock od 200MHz
+                    else // phase is not small, use coarse measurement only, phase sampling frequency is 200MHz
                     {
                         phase = (Convert.ToDouble(inputValues[2])) / 200000000 * (-1); // 200MHz sampling
                     }
@@ -65,7 +57,7 @@ namespace OCXO_App
             List<Int32> inputValues = new List<Int32>();
             double phase = 0;
             /****************************************
-             * Racunanje faze iz primljene poruke ali grubo i rezultat je cijeli broj (nije u sekundama nego sec/400000000) (ili sec/200000000) 
+             * calculating phase from input string, raw data (not used)
              ****************************************/
             foreach (string s in subInputs)
             {

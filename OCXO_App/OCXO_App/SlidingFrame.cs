@@ -13,13 +13,13 @@ namespace OCXO_App
 
         // public double part_DAC { get; private set; }
 
-        public bool finished { get; private set; }  // postane "true" kada se baoybu "phaseArray" i ostane i dalje "true" dok se slidingFrame pomice udesno
+        public bool finished { get; private set; }  // this is true when phaseArray is full, and remains true when slidingFrame moves to the right
 
-        public int nCounter { get; private set; } // povecavamo counter samo dok ne dodje do "averageSize" i onda ostaje na toj vrijednosti
+        public int nCounter { get; private set; } // increasing counter until it becomes equal to averageSize
 
-        double[] phaseArray; // klizna Array
-        int totalFrameSize;  // ukupna duzina frame. Sastoji se od "averageSize" za racunicu prve tacke, pauze izmedju 2 tacke i jos jedne "averageSize" za drugu tacku
-        int averageSize;  // koliko elemenata se koristi da se izracuna tacka A1 ili A2 
+        double[] phaseArray; // slidingArray
+        int totalFrameSize;  // total frame size
+        int averageSize;  // number of elements for average
 
         public SlidingFrame()
         {
@@ -46,20 +46,20 @@ namespace OCXO_App
         {
             if (nCounter == totalFrameSize)
             {
-                for (int i = 0; i < totalFrameSize - 1; i++) // izbaci prvi element i prekopiraj clanove uljevo
+                for (int i = 0; i < totalFrameSize - 1; i++) // reject the first element
                 {
                     phaseArray[i] = phaseArray[i + 1];
                 }
 
-                phaseArray[totalFrameSize - 1] = phase; // dodaj novi element
-                finished = true;  // nije potrebno ovdje jer vec je bio "finished" dole kada je napunio array ali za svaki slucaj ...
+                phaseArray[totalFrameSize - 1] = phase; // adding new element
+                finished = true;  
             }
             else
             {
                 phaseArray[nCounter] = phase;
-                nCounter++;  // povecavamo counter samo ako nije dosao do averageSize
+                nCounter++;
 
-                if (nCounter == totalFrameSize) // upravo popunili array po prvi put
+                if (nCounter == totalFrameSize) // array is full for first time
                     finished = true;
             }
 
@@ -71,7 +71,6 @@ namespace OCXO_App
             }
         }
 
-        // Example: ako faza se promjeni za 3ns a total Frame = 100, onda je ovo 3 deg. Ako se faza promjeni za 1.5 a total frame = 50, onda je to opet = 3 deg
         private void CalculateAngle()
         {
             part_angle = (phaseAvg_stop - phaseAvg_start) * Math.Pow(10, 9) * 100 / totalFrameSize;

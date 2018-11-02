@@ -16,7 +16,7 @@ namespace OCXO_App
         double outputValue;
 
         public const int AVG_SIZE = 10;
-        const double ALPHA_NORMAL = 0.1;  // mora biti izmedju 0 i 1. Sto je manji, nova vrijednost utice manje na rezultat
+        const double ALPHA_NORMAL = 0.1;  // alpha si between 0 and 1
 
         int avg_size;
         double alpha_normal;
@@ -34,8 +34,6 @@ namespace OCXO_App
             this.alpha_normal = alpha_normal;
         }
 
-        // !!! OVDJE IMA GRESKA sve dok nemas dovoljno elementata (AVG_SIZE), on vraca "fNextInput". Tek poslije toga, on pocinje da pravi 
-        // average od sljedecih elemenata. To znaci da ignorise prvih "AVG_SIZE" elemenata i ne koristi ih u average
         public double calculateExpAvg(double fNextInput)
         {
             m_sampleCount++;
@@ -62,9 +60,9 @@ namespace OCXO_App
             double previousOutputValue;
             double output = 0;
 
-            previousOutputValue = dInputs[nStartInd]; // uzmi prvi element kao da je output
+            previousOutputValue = dInputs[nStartInd];
 
-            for (int i = nStartInd + 1; i < nStartInd + length; i++) // i nastavi od sljedeceg elementa
+            for (int i = nStartInd + 1; i < nStartInd + length; i++)
             {
                 output = ALPHA_NORMAL * dInputs[i] + (1.0 - ALPHA_NORMAL) * previousOutputValue;
                 previousOutputValue = output;

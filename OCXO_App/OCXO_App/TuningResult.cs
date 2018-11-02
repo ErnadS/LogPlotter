@@ -11,7 +11,7 @@ namespace OCXO_App
         {
             NOT_FINISHED,
             FINISHED,
-            OUT_OF_RANGE  // previse velika fazna razlika (treba izaci iz ovog state)
+            OUT_OF_RANGE  // to big phase difference
         }
 
         public double newDAC { get; set; }

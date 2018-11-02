@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace OCXO_App
 {
-    class Regulator
+    class Regulator // Regulator Class, implemented PI regulator with anti-windup scheme (anti-windup used because saturation at the output of the PI regulator)
     {
+        /* Constants for PI Regulator */
         int saturationMax = 300, saturationMin = -300;
         double refPhase = 0;
         double p = -10123911730;
@@ -19,8 +20,9 @@ namespace OCXO_App
         double iSignal = 0, satSignal = 0;
         double dac_corr = 0, e_t_acc = 0;
         double Ti = 0.0001;
-
         Int16 N = 60;
+        /* Constants for PI Regulator */
+
         public Regulator() { }
         AverageExp average = new AverageExp();
 
